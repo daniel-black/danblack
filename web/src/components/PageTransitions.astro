@@ -1,0 +1,23 @@
+---
+// Page-to-page transitions: home ↔ section pages keep the band zoom and title morph
+// (see global.css), but clicks between two section pages switch instantly with no fade.
+// In-page animations (the orbit launch and re-entry) are unaffected.
+---
+
+<script>
+  const isSection = (url: URL) => url.pathname !== '/';
+
+  document.addEventListener('astro:before-swap', (e) => {
+    const root = e.newDocument.documentElement;
+    if (isSection(e.from) && isSection(e.to)) root.dataset.instant = '';
+    else delete root.dataset.instant;
+  });
+</script>
+
+<style is:global>
+  :root[data-instant]::view-transition-group(*),
+  :root[data-instant]::view-transition-old(*),
+  :root[data-instant]::view-transition-new(*) {
+    animation: none !important;
+  }
+</style>

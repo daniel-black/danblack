@@ -3,6 +3,7 @@ import { Font } from 'astro:assets';
 import { ClientRouter } from 'astro:transitions';
 import Boats from '../components/Boats.astro';
 import Descent from '../components/Descent.astro';
+import PageTransitions from '../components/PageTransitions.astro';
 import Sky from '../components/Sky.astro';
 import SkyControls from '../components/SkyControls.astro';
 import SkyState from '../components/SkyState.astro';
@@ -53,6 +54,7 @@ const ogImage = new URL(image, Astro.site);
     <meta name="generator" content={Astro.generator} />
     <ClientRouter />
     <SkyState />
+    <PageTransitions />
   </head>
   <body>
     <Sky />

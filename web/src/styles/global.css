@@ -583,6 +583,46 @@ h2 {
   filter: var(--ground-time) var(--ground-weather);
 }
 
+/* Boats (see Boats.astro) sail the far stripe of the sea; masts rise above the horizon. */
+.boat {
+  --bpx: 3px;
+  position: absolute;
+  left: 0;
+  top: calc(var(--sea-h) * 0.3 - (var(--waterline) + 2) * var(--bpx));
+  width: calc(var(--w) * var(--bpx));
+  height: calc(var(--h) * var(--bpx));
+  background: var(--src) 0 0 / 100% 100%;
+  translate: -100% 0;
+  animation-name: sail, swell;
+  animation-timing-function: linear, steps(1);
+  animation-iteration-count: infinite;
+}
+
+/* Cross during this boat's share of the rotation (1/3 for the 3 boats in Boats.astro;
+   keyframe selectors can't use variables), then wait offscreen. */
+@keyframes sail {
+  from {
+    translate: -100% 0;
+  }
+  33.333% {
+    translate: 100vw 0;
+  }
+  to {
+    translate: 100vw 0;
+  }
+}
+
+/* One art pixel up and back; no rotation, so edges stay crisp. */
+@keyframes swell {
+  50% {
+    transform: translateY(var(--bpx));
+  }
+}
+
+:root[data-weather='storm'] .boat {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -596,6 +636,15 @@ h2 {
   .cloud {
     animation: none;
     translate: var(--x) 0;
+  }
+
+  .boat {
+    animation: none;
+    translate: 18vw 0;
+  }
+
+  .boat ~ .boat {
+    display: none;
   }
 
   .bird,

@@ -1,6 +1,7 @@
 ---
 import { Font } from 'astro:assets';
 import { ClientRouter } from 'astro:transitions';
+import Boats from '../components/Boats.astro';
 import Sky from '../components/Sky.astro';
 import SkyControls from '../components/SkyControls.astro';
 import SkyState from '../components/SkyState.astro';
@@ -48,6 +49,7 @@ const ogImage = new URL(image, Astro.site);
     <Sky />
     <slot />
     <footer class="ground" transition:persist="ground">
+      <Boats />
       <SkyControls />
     </footer>
   </body>

@@ -1,0 +1,26 @@
+---
+// Boats take turns crossing the sea, one at a time. Every boat runs the same loop
+// (CROSSING × boats.length): it crosses during the first share, then waits offscreen.
+// Staggering the start by one crossing per boat means two are never on the water at once.
+// Adding or removing a boat? Update the 33.333% share in the `sail` keyframes in global.css.
+const CROSSING = 240; // seconds to sail across
+const START = 70; // seconds into the rotation at page load, so a boat is already out
+
+// w/h are sprite sizes in art pixels; waterline is the sprite row that sits on the water.
+const boats = [
+  { name: 'sailboat', w: 20, h: 15, waterline: 13 },
+  { name: 'carrier', w: 40, h: 12, waterline: 10 },
+  { name: 'pirate-ship', w: 26, h: 18, waterline: 16 },
+];
+const loop = CROSSING * boats.length;
+---
+
+{
+  boats.map((b, i) => (
+    <div
+      class="boat"
+      aria-hidden="true"
+      style={`--src: url('/sprites/${b.name}.svg'); --w: ${b.w}; --h: ${b.h}; --waterline: ${b.waterline}; animation-duration: ${loop}s, 1.6s; animation-delay: ${-(((loop - i * CROSSING) % loop) + START)}s, ${-i * 0.5}s`}
+    />
+  ))
+}

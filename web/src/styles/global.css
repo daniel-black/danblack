@@ -78,7 +78,20 @@ body > main {
   font-size: clamp(3rem, 10vw, 6.5rem);
   line-height: 1;
   color: white;
-  text-shadow: 0.06em 0.06em 0 var(--dialog-ink);
+  /* Square 8-way outline (reads on cloud or sky), then a hard drop shadow. */
+  --o: 0.03em;
+  --drop: calc(var(--o) * 2.5);
+  --ink: var(--dialog-ink);
+  text-shadow:
+    var(--o) 0 var(--ink),
+    calc(var(--o) * -1) 0 var(--ink),
+    0 var(--o) var(--ink),
+    0 calc(var(--o) * -1) var(--ink),
+    var(--o) var(--o) var(--ink),
+    calc(var(--o) * -1) calc(var(--o) * -1) var(--ink),
+    var(--o) calc(var(--o) * -1) var(--ink),
+    calc(var(--o) * -1) var(--o) var(--ink),
+    var(--drop) var(--drop) 0 var(--ink);
   text-decoration: none;
   view-transition-class: band;
 }
@@ -88,6 +101,9 @@ body > main {
 }
 
 .site-title-sm {
+  /* Outline only at small sizes; the drop shadow reads as a smudge. */
+  --o: 0.05em;
+  --drop: 0;
   display: block;
   font-size: clamp(1.5rem, 3vw, 2rem);
 }

@@ -39,6 +39,12 @@ const ogImage = new URL(image, Astro.site);
     <ClientRouter />
   </head>
   <body>
-    <slot />
+    <div class="sky" aria-hidden="true" transition:persist></div>
+    <main class="stage">
+      <div class="dialog">
+        <slot />
+      </div>
+    </main>
+    <footer class="ground" transition:persist></footer>
   </body>
 </html>

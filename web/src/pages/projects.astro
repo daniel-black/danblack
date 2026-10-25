@@ -1,7 +1,143 @@
 ---
+import { Image } from 'astro:assets';
 import SectionLayout from '../layouts/SectionLayout.astro';
+import { projects } from '../projects.ts';
+
+const featured = projects.filter((p) => p.featured);
+const others = projects.filter((p) => !p.featured);
 ---
 
-<SectionLayout title="Projects" description="Dan Black's projects." band="--sky-3" slug="projects">
-  <p>Coming soon.</p>
+<SectionLayout
+  title="Projects"
+  description="Projects by Dan Black, including Chiptunes, a Game Boy–style music tracker for the browser."
+  band="--sky-3"
+  slug="projects"
+>
+  {
+    featured.map((p) => (
+      <article class="featured">
+        {p.image && (
+          <a class="shot" href={p.url} target="_blank" rel="noreferrer" tabindex="-1" aria-hidden="true">
+            <Image src={p.image.src} alt={p.image.alt} widths={[640, 1280]} sizes="(max-width: 42rem) 100vw, 38rem" />
+          </a>
+        )}
+        <h2>
+          <a href={p.url} target="_blank" rel="noreferrer">{p.name}</a>
+        </h2>
+        <p class="tagline">{p.tagline}</p>
+        <p>{p.description}</p>
+        <ul class="tags" aria-label="Built with">
+          {p.tags.map((t) => <li>{t}</li>)}
+        </ul>
+        <div class="actions">
+          <a class="cta" href={p.url} target="_blank" rel="noreferrer">
+            <span aria-hidden="true">▶</span> {p.cta ?? `Visit ${p.name}`}
+          </a>
+          {p.repo && (
+            <a href={p.repo} target="_blank" rel="noreferrer">
+              Source on GitHub
+            </a>
+          )}
+        </div>
+      </article>
+    ))
+  }
+  {
+    others.length > 0 && (
+      <ul class="others">
+        {others.map((p) => (
+          <li>
+            <a href={p.url} target="_blank" rel="noreferrer">{p.name}</a>: {p.tagline}
+          </li>
+        ))}
+      </ul>
+    )
+  }
 </SectionLayout>
+
+<style>
+  .featured > * + * {
+    margin-top: 0.75rem;
+  }
+
+  /* Screenshot framed like a little screen: ink border and a hard drop shadow. */
+  .shot {
+    display: block;
+    margin-bottom: 1.25rem;
+    border: var(--px) solid var(--dialog-ink);
+    border-radius: var(--px);
+    box-shadow: 0 var(--px) 0 oklch(0% 0 0 / 0.2);
+    overflow: hidden;
+  }
+
+  :global(.content) a.shot::after {
+    content: none;
+  }
+
+  .shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .featured h2 {
+    margin-top: 0;
+    font-size: 2rem;
+  }
+
+  .featured h2 a {
+    text-decoration: none;
+  }
+
+  .featured h2 a:hover {
+    text-decoration: underline;
+  }
+
+  .tagline {
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0;
+    list-style: none;
+    font-family: var(--font-pixel);
+    font-size: 0.875rem;
+  }
+
+  .tags li {
+    padding: 0.125rem 0.5rem;
+    border: 2px solid var(--dialog-ink);
+    border-radius: var(--px);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    padding-top: 0.5rem;
+  }
+
+  /* Overrides the underlined .content link style: this one is a button. */
+  :global(.content) a.cta {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    font-family: var(--font-pixel);
+    color: var(--dialog-bg);
+    background: var(--dialog-ink);
+    border-radius: var(--px);
+    text-decoration: none;
+  }
+
+  :global(.content) a.cta::after {
+    content: none;
+  }
+
+  :global(.content) a.cta:hover {
+    background: oklch(from var(--dialog-ink) calc(l + 0.1) c h);
+  }
+</style>

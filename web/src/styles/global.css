@@ -551,6 +551,47 @@ h2 {
   padding: clamp(2rem, 12vh, 8rem) 1rem 4rem;
 }
 
+/* Body copy on section pages (inside the dialog). */
+.content {
+  line-height: 1.65;
+}
+
+.content > * + * {
+  margin-top: 1em;
+}
+
+.content h2 {
+  margin-top: 2em;
+  font-size: 1.5rem;
+}
+
+.content a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--dialog-frame);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere; /* long emails/URLs wrap on narrow screens */
+}
+
+.content a:hover {
+  text-decoration-color: currentColor;
+}
+
+.content a:focus-visible {
+  outline: 2px dashed var(--dialog-ink);
+  outline-offset: 2px;
+}
+
+/* External links get a small arrow (skipped by screen readers); mailto stays plain. */
+.content a[href^='http']::after {
+  content: '↗';
+  content: '↗' / '';
+  display: inline-block; /* keeps the underline off the arrow */
+  margin-left: 0.15em;
+  font-size: 0.8em;
+}
+
 /* Pokémon-style text box: dark outline, cream fill, inset blue frame. */
 .dialog {
   position: relative;
@@ -570,6 +611,7 @@ h2 {
 /* Horizon: foam line, two-tone sea, then the grass sprite tiled over the ground. */
 .ground {
   position: relative;
+  overflow-x: clip; /* boats waiting offscreen would otherwise widen the page; masts still rise above */
   --sea-h: calc(var(--px) * 20);
   --grass-w: calc(32 * var(--px));
   --grass-h: calc(13 * var(--px));

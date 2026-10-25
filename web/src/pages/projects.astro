@@ -18,7 +18,7 @@ const others = projects.filter((p) => !p.featured);
       <article class="featured">
         {p.image && (
           <a class="shot" href={p.url} target="_blank" rel="noreferrer" tabindex="-1" aria-hidden="true">
-            <Image src={p.image.src} alt={p.image.alt} widths={[640, 1280]} sizes="(max-width: 42rem) 100vw, 38rem" />
+            <Image src={p.image.src} alt={p.image.alt} widths={[640, 1280, 1800]} sizes="(max-width: 42rem) 100vw, 54rem" />
           </a>
         )}
         <h2>

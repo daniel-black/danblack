@@ -1,0 +1,43 @@
+---
+import { render } from 'astro:content';
+import SectionLayout from '../../layouts/SectionLayout.astro';
+import { formatDate, getPosts } from '../../writing.ts';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const { title, description, pubDate, updatedDate, originalUrl } = post.data;
+const originalHost = originalUrl && new URL(originalUrl).hostname.replace(/^www\./, '');
+---
+
+<SectionLayout
+  title={title}
+  description={description}
+  band="--sky-5"
+  slug="writing"
+  article={{ publishedTime: pubDate, modifiedTime: updatedDate }}
+>
+  <p class="post-meta">
+    <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+    {updatedDate && <> · Updated <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time></>}
+    {originalUrl && <> · Originally published on <a href={originalUrl} target="_blank" rel="noreferrer">{originalHost}</a></>}
+  </p>
+  <Content />
+  <p class="post-back"><a href="/writing">← All writing</a></p>
+</SectionLayout>
+
+<style>
+  .post-meta {
+    font-size: 0.875rem;
+    opacity: 0.7;
+  }
+
+  .post-back {
+    padding-top: 1rem;
+    font-family: var(--font-pixel);
+  }
+</style>

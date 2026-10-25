@@ -1,0 +1,34 @@
+---
+title: Reciprocal Violence
+description: A non-extinct human problem.
+pubDate: 2024-06-29
+originalUrl: https://calibrating.substack.com/p/reciprocal-violence
+---
+
+I’m currently reading *[Violence and the Sacred](https://www.amazon.com/Violence-Sacred-Ren%C3%A9-Girard/dp/0801822181)* by [Rene Girard](https://en.wikipedia.org/wiki/Ren%C3%A9_Girard) and in order to better understand the ideas discussed in the book, I want to put them into my own writing. They’re also really cool and worth sharing so that’s also part of the reason I’m writing this.
+
+> Basic background on Girard:
+>
+> He read a bunch of the myths, canonical texts, and religious works and put forward an explanation of human behavior called [Mimetic Theory](https://en.wikipedia.org/wiki/Mimetic_theory). Basically, the idea is that people imitate the desires of other people. I’m underselling it here but this is probably the single most impactful idea I’ve ever encountered in my life. Once you see it, you can’t stop seeing it everywhere. Because people imitate the desires of others, they naturally get drawn into conflict with one another. Conflicts escalate and before long everyone is at everyone else’s throat. To prevent the community from destroying itself in a fit of unlimited violence, they (unconsciously!!!) deflect the violence onto a scapegoat. They say, “Bob is the reason our crops are struggling this year. If we just got rid of Bob, everything would be fine”. So the community kills or excommunicates Bob. And this works!! Violence is temporarily satiated and peace is restored until another round of desire driven conflict bubbles up. The victim (poor Bob) was not actually guilty though. He was just “Other” enough that the community could convince themselves that he actually was the curse on their crops (this is the mythical lie that Christianity reveals).
+>
+> Anyways, in short, the cycle goes:
+>
+> **Imitation of desire** → **Community in crisis** → **Murder or exile of a scapegoat** → **Temporary peace** → **…and on and on it goes**
+
+---
+
+In the beginning of *Violence and the Sacred*, Girard (appropriately) examines the link between violence and the sacred or religious. These are really weird concepts to us as moderns because we don’t encounter much violence and sacrifice in our day to day lives. But for early humans, violence was like the main thing. That was what you and your community worried about. Less so external violence and more so internal violence.
+
+The fear was that if your neighbor kills your brother, then you would seek revenge and kill your neighbor, whose family, in turn, wants revenge and kills you. And so the cycle of vengeance can go on and on, only terminating when there is no one left to kill. Obviously, that’s pretty disastrous for everyone involved. If communities are to survive, they need some mechanism to terminate this cycle of reciprocal violence.
+
+This is where sacrifice comes in. The latent violence in the community after a wrongdoing needs an outlet. Communities develop rituals of sacrifice to discharge the violence so that it doesn’t continue to escalate and destroy the entire community. There necessarily has to be a level of misunderstanding involved in such a sacrifice for it to be effective though. There needs to be a veil of sorts around the ritual. Often this manifests in a religious form. The priest sacrifices the scapegoat to appease some authoritative deity that cannot be denied. You wouldn’t dare strike out against the actual perpetrator in an act of retribution for fear of a godly curse. And the appearance of the whole spectacle is similar enough to satisfy the bloodlust and put an end to the cycle of violence. The scapegoat cannot actually be the guilty person because then we’re just straight back to retribution and the scapegoat’s family has cause for revenge again. It could be the guilty person’s brother though. He is similar enough that the violence done against him satisfies the aggrieved family’s thirst for revenge. This seems crazy and barbaric to us moderns but when the alternative for the primitive community is total destruction, it makes sense.
+
+So over time, rituals of sacrifice gain a type of mystique and religious character. Sacrifice is a means of restraining violence in a community. It buys temporary peace at the price of the blood of the marginal person in a community. The early community literally cannot survive without it.
+
+What does this have to do with us though? We don’t really have family blood feuds or witch burnings in America. Very true, reader. We do, however, have a judicial system. Our judicial system plays the exact same role in society as sacrifice did in early communities. It exists to limit and contain reciprocal violence. We have notions of justice and fairness, but its real function is to prevent us from tearing each other apart. And I should note, it does an exceptional job of this. Our judicial system is much much better than the sacrificial rituals of early communities. In our judicial system, when Jack kills Joe, Jack is tried, found guilty, and punished. Joe’s family is not about to commit a revenge kill. The judicial system is imbued with an unquestionable authority. You’re not going to take matters into your own hands. The judge made a decision and you’re going to live with it. Rarely does the loose cannon seek vigilante justice and kill the killer’s brother. Sweet, so we found a pretty okay way to put a stop to vengeful cycles of violence. Love that for us. This is progress for sure. We can now use less violence to put a stop to violence.
+
+Crucially though, the judicial system and sacrifice play the same role in society. You have to zoom out a little but it’s still just a mechanism for containing reciprocal violence. Unquestionably, the judicial system is better than sacrifice. It’s not perfect though.
+
+What might be a perfect mechanism for preventing violence (i’m about to start foreshadowing pretty hard)? Unanimous and voluntary renunciation of all violence? Love and forgiveness? It’s starting to sound like the Kingdom of Heaven in here. This is where Christianity comes into the story but I’m getting ahead of myself. I do want to just point out forgiveness though really quick. This is the key to escaping reciprocal violence. A wrong forgiven does not beget another wrong and the cycle can end there. An entire world of forgiveness would literally and definitionally just be Heaven on Earth. I am a realist though. But you can start creating little pockets of Heaven on Earth wherever you go and that’s pretty sick so I’ll just leave it at that.
+
+![An old engraving of a pistol duel: two men fire at each other in a clearing on a riverbank while onlookers watch from the brush.](./images/reciprocal-violence-feud.jpeg)

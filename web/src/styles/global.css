@@ -565,6 +565,51 @@ h2 {
   font-size: 1.5rem;
 }
 
+.content :is(ul, ol) {
+  padding-left: 1.5em;
+}
+
+.content ul {
+  list-style: square;
+}
+
+.content ol {
+  list-style: decimal;
+}
+
+.content li + li {
+  margin-top: 0.25em;
+}
+
+.content blockquote {
+  padding-left: 1em;
+  border-left: var(--px) solid var(--dialog-frame);
+  font-style: italic;
+}
+
+.content blockquote > * + * {
+  margin-top: 1em;
+}
+
+.content img {
+  max-width: 100%;
+  height: auto;
+}
+
+.content :not(pre) > code {
+  padding: 0.1em 0.3em;
+  font-size: 0.9em;
+  background: oklch(from var(--dialog-ink) l c h / 0.08);
+  border-radius: 3px;
+}
+
+.content pre {
+  padding: 1em;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  border-radius: var(--px);
+}
+
 .content a {
   color: inherit;
   text-decoration: underline;
@@ -596,9 +641,11 @@ h2 {
 .dialog {
   position: relative;
   z-index: 1;
-  max-width: 42rem;
+  /* Grows with the screen up to a cap; text grows a little too so lines don't get too long. */
+  max-width: clamp(42rem, 62vw, 54rem);
   margin-inline: auto;
   padding: 2rem;
+  font-size: clamp(1rem, 0.85rem + 0.25vw, 1.125rem);
   background: var(--dialog-bg);
   border: var(--px) solid var(--dialog-ink);
   border-radius: calc(var(--px) * 2);

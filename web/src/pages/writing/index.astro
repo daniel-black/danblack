@@ -1,0 +1,48 @@
+---
+import SectionLayout from '../../layouts/SectionLayout.astro';
+import { formatDate, getPosts } from '../../writing.ts';
+
+const posts = await getPosts();
+---
+
+<SectionLayout title="Writing" description="Essays and notes by Dan Black." band="--sky-5" slug="writing">
+  <ul class="posts">
+    {
+      posts.map((post) => (
+        <li>
+          <a href={`/writing/${post.id}`}>{post.data.title}</a>
+          <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+          <p>{post.data.description}</p>
+        </li>
+      ))
+    }
+  </ul>
+</SectionLayout>
+
+<style>
+  .posts {
+    padding: 0;
+    list-style: none;
+  }
+
+  .posts li + li {
+    margin-top: 1.75rem;
+  }
+
+  .posts a {
+    font-family: var(--font-pixel);
+    font-size: 1.5rem;
+    line-height: 1.25;
+  }
+
+  .posts time {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    opacity: 0.7;
+  }
+
+  .posts p {
+    margin-top: 0.5rem;
+  }
+</style>

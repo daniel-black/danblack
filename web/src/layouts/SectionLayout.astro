@@ -9,12 +9,13 @@ interface Props {
   band: string;
   /** Section slug; morphs the page background from that band on the home page. */
   slug?: string;
+  article?: { publishedTime: Date; modifiedTime?: Date | undefined };
 }
 
-const { title, description, band, slug } = Astro.props;
+const { title, description, band, slug, article } = Astro.props;
 ---
 
-<BaseLayout title={`${title} — Dan Black`} description={description}>
+<BaseLayout title={`${title} — Dan Black`} description={description} article={article}>
   <div
     class="page-bg"
     style={`--c: var(${band})`}

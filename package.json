@@ -1,0 +1,23 @@
+{
+  "name": "danblack",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "synth": "pnpm --filter infra synth",
+    "deploy": "pnpm build && pnpm --filter infra deploy",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.15.0",
+      "onFail": "download"
+    }
+  },
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "packageManager": "pnpm@12.15.0"
+}

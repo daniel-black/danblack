@@ -1,0 +1,11 @@
+---
+import Counter from '../islands/Counter.tsx';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Dan Black" description="Personal site of Dan Black.">
+  <main>
+    <h1>Dan Black</h1>
+    <Counter client:visible />
+  </main>
+</BaseLayout>

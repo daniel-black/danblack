@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme inline {
+  --font-pixel: var(--font-geist-pixel);
+}
+
 /* Scene palette. Weather/time-of-day states will override these later. */
 :root {
   --sky-1: oklch(68% 0.14 240);
@@ -13,7 +17,7 @@
   --sea-foam: oklch(97% 0.02 220);
 
   --grass-light: oklch(82% 0.19 135);
-  --grass: oklch(62% 0.11 145);
+  --grass: #4a8a46; /* matches the bottom row of grass.svg */
 
   --dialog-bg: oklch(98% 0.01 95);
   --dialog-ink: oklch(30% 0.02 260);
@@ -38,19 +42,56 @@ body {
   background: var(--sky-5);
 }
 
-/* Fixed backdrop: hard color stops, no smooth gradient, so it reads as pixel art. */
+/* Fixed backdrop: flat bands joined by dithered rows, so it reads as pixel art. */
 .sky {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(
-    to bottom,
-    var(--sky-1) 0 30%,
-    var(--sky-2) 30% 50%,
-    var(--sky-3) 50% 66%,
-    var(--sky-4) 66% 80%,
-    var(--sky-5) 80%
-  );
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.band {
+  flex-basis: 0;
+  background: var(--c);
+}
+
+/* Three 2px-art rows: 25% → 50% → 75% of the next color. */
+.dither {
+  --tile: calc(var(--px) * 2);
+  flex: none;
+  height: calc(var(--tile) * 3);
+  background:
+    conic-gradient(from 90deg at var(--px) var(--px), var(--a) 75%, var(--b) 0) 0 0 / var(--tile)
+      var(--tile) repeat-x,
+    repeating-conic-gradient(var(--a) 0 25%, var(--b) 0 50%) 0 var(--tile) / var(--tile) var(--tile)
+      repeat-x,
+    conic-gradient(from 90deg at var(--px) var(--px), var(--b) 75%, var(--a) 0) var(--px)
+      calc(var(--tile) * 2) / var(--tile) var(--tile) repeat-x;
+}
+
+.cloud {
+  position: absolute;
+  left: 0;
+  width: calc(var(--w) * var(--px) * 2);
+  height: calc(var(--h) * var(--px) * 2);
+  animation: drift linear infinite;
+}
+
+@keyframes drift {
+  from {
+    translate: 100vw 0;
+  }
+  to {
+    translate: -100% 0;
+  }
+}
+
+h1,
+h2 {
+  font-family: var(--font-pixel);
+  font-weight: 400; /* single-weight face; avoid faux bold */
 }
 
 .stage {
@@ -71,19 +112,18 @@ body {
     0 calc(var(--px) * 2) 0 oklch(0% 0 0 / 0.2);
 }
 
-/* Horizon + grass, placeholder bands until sprites exist. */
+/* Horizon: foam line, two-tone sea, then the grass sprite tiled over the ground. */
 .ground {
-  --sea-h: calc(var(--px) * 12);
-  --teeth-h: calc(var(--px) * 2);
+  --sea-h: calc(var(--px) * 20);
+  --grass-w: calc(32 * var(--px));
+  --grass-h: calc(13 * var(--px));
   height: clamp(8rem, 22vh, 12rem);
   background:
+    url('/sprites/grass.svg') 0 calc(var(--sea-h) - var(--px) * 6) / var(--grass-w) var(--grass-h)
+      repeat-x,
     linear-gradient(var(--sea-foam) 0 var(--px), transparent 0) 0 0 / 100% var(--sea-h) no-repeat,
     linear-gradient(var(--sea-1) 0 50%, var(--sea-2) 50%) 0 0 / 100% var(--sea-h) no-repeat,
-    repeating-linear-gradient(90deg, var(--grass-light) 0 calc(var(--px) * 2), transparent 0 calc(var(--px) * 4))
-      0 var(--sea-h) / 100% var(--teeth-h) no-repeat,
-    linear-gradient(var(--grass-light) 0 calc(var(--px) * 3), var(--grass) 0) 0
-      calc(var(--sea-h) + var(--teeth-h)) / 100% 100% no-repeat,
-    var(--sea-2);
+    var(--grass);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -94,5 +134,10 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .cloud {
+    animation: none;
+    translate: var(--x) 0;
   }
 }

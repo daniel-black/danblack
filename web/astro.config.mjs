@@ -1,7 +1,7 @@
 // @ts-check
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
-import { defineConfig } from 'astro/config';
+import { defineConfig, fontProviders } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
@@ -12,4 +12,15 @@ export default defineConfig({
   build: { format: 'directory' },
   integrations: [react()],
   vite: { plugins: [tailwindcss()] },
+  fonts: [
+    {
+      provider: fontProviders.local(),
+      name: 'Geist Pixel',
+      cssVariable: '--font-geist-pixel',
+      fallbacks: ['monospace'],
+      options: {
+        variants: [{ src: ['./src/assets/fonts/GeistPixel-Square.woff2'], weight: 400, style: 'normal' }],
+      },
+    },
+  ],
 });

@@ -1,0 +1,44 @@
+---
+// Sky bands from top to bottom, as [color var, relative height].
+const bands: [string, number][] = [
+  ['--sky-1', 30],
+  ['--sky-2', 20],
+  ['--sky-3', 16],
+  ['--sky-4', 14],
+  ['--sky-5', 20],
+];
+
+// Resting x (vw) is used when motion is reduced; duration/delay drive the drift.
+const clouds = [
+  { src: '/sprites/cloud-lg.svg', w: 32, h: 13, top: '8%', x: 10, duration: 160, delay: -40 },
+  { src: '/sprites/cloud-sm.svg', w: 16, h: 7, top: '4%', x: 55, duration: 220, delay: -150 },
+  { src: '/sprites/cloud-lg.svg', w: 32, h: 13, top: '20%', x: 70, duration: 120, delay: -95 },
+  { src: '/sprites/cloud-sm.svg', w: 16, h: 7, top: '34%', x: 30, duration: 90, delay: -20 },
+];
+---
+
+<div class="sky" aria-hidden="true" transition:persist>
+  {
+    bands.map(([color, weight], i) => {
+      const next = bands[i + 1];
+      return (
+        <>
+          <div class="band" style={`--c: var(${color}); flex-grow: ${weight}`} />
+          {next && <div class="dither" style={`--a: var(${color}); --b: var(${next[0]})`} />}
+        </>
+      );
+    })
+  }
+  {
+    clouds.map((c) => (
+      <img
+        class="cloud"
+        src={c.src}
+        alt=""
+        width={c.w}
+        height={c.h}
+        style={`--w: ${c.w}; --h: ${c.h}; top: ${c.top}; --x: ${c.x}vw; animation-duration: ${c.duration}s; animation-delay: ${c.delay}s`}
+      />
+    ))
+  }
+</div>

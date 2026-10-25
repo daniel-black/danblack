@@ -79,6 +79,41 @@ body {
   animation: drift linear infinite;
 }
 
+/* bird.svg is 4 frames of 22×15 side by side: up, mid, down, mid. */
+.bird {
+  --art: calc(var(--px) * var(--scale));
+  position: absolute;
+  left: 0;
+  width: calc(22 * var(--art));
+  height: calc(15 * var(--art));
+  background: url('/sprites/bird.svg') 0 0 / calc(88 * var(--art)) 100%;
+  animation-name: flap, fly, bob;
+  animation-timing-function: steps(4), linear, ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes flap {
+  to {
+    background-position-x: calc(-88 * var(--art));
+  }
+}
+
+@keyframes fly {
+  from {
+    translate: 100vw 0;
+  }
+  25%,
+  to {
+    translate: -100% 0;
+  }
+}
+
+@keyframes bob {
+  50% {
+    transform: translateY(calc(var(--art) * 3));
+  }
+}
+
 @keyframes drift {
   from {
     translate: 100vw 0;
@@ -139,5 +174,9 @@ h2 {
   .cloud {
     animation: none;
     translate: var(--x) 0;
+  }
+
+  .bird {
+    display: none;
   }
 }

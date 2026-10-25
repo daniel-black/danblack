@@ -4,17 +4,41 @@
   --font-pixel: var(--font-geist-pixel);
 }
 
-/* Scene palette. Weather/time-of-day states will override these later. */
+/*
+ * Scene palette. <html data-time data-weather> (set by SkyState.astro) picks a
+ * time-of-day base palette (--t-*); weather then scales its lightness (--wl) and
+ * chroma (--wc), so every time × weather combination works without its own palette.
+ */
 :root {
-  --sky-1: oklch(68% 0.14 240);
-  --sky-2: oklch(74% 0.12 235);
-  --sky-3: oklch(80% 0.1 228);
-  --sky-4: oklch(86% 0.07 220);
-  --sky-5: oklch(92% 0.04 210);
+  --t-sky-1: oklch(68% 0.14 240);
+  --t-sky-2: oklch(74% 0.12 235);
+  --t-sky-3: oklch(80% 0.1 228);
+  --t-sky-4: oklch(86% 0.07 220);
+  --t-sky-5: oklch(92% 0.04 210);
+  --t-sea-1: oklch(55% 0.17 255);
+  --t-sea-2: oklch(65% 0.14 245);
+  --t-sea-foam: oklch(97% 0.02 220);
 
-  --sea-1: oklch(55% 0.17 255);
-  --sea-2: oklch(65% 0.14 245);
-  --sea-foam: oklch(97% 0.02 220);
+  --wl: 1;
+  --wc: 1;
+
+  --sky-1: oklch(from var(--t-sky-1) calc(l * var(--wl)) calc(c * var(--wc)) h);
+  --sky-2: oklch(from var(--t-sky-2) calc(l * var(--wl)) calc(c * var(--wc)) h);
+  --sky-3: oklch(from var(--t-sky-3) calc(l * var(--wl)) calc(c * var(--wc)) h);
+  --sky-4: oklch(from var(--t-sky-4) calc(l * var(--wl)) calc(c * var(--wc)) h);
+  --sky-5: oklch(from var(--t-sky-5) calc(l * var(--wl)) calc(c * var(--wc)) h);
+  --sea-1: oklch(from var(--t-sea-1) calc(l * var(--wl)) calc(c * var(--wc)) h);
+  --sea-2: oklch(from var(--t-sea-2) calc(l * var(--wl)) calc(c * var(--wc)) h);
+  --sea-foam: oklch(from var(--t-sea-foam) calc(l * var(--wl)) calc(c * var(--wc)) h);
+
+  /* Filters for the sprite layers (time, then weather). */
+  --cloud-time: brightness(1);
+  --cloud-weather: saturate(1);
+  --ground-time: brightness(1);
+  --ground-weather: saturate(1);
+
+  /* Text drawn straight on the sky (band labels). */
+  --band-ink: var(--dialog-ink);
 
   --grass-light: oklch(82% 0.19 135);
   --grass: #4a8a46; /* matches the bottom row of grass.svg */
@@ -25,6 +49,76 @@
 
   --px: 4px; /* one "art pixel" at the current scale */
   --gutter: clamp(2rem, 5vw, 3rem); /* wide enough for the hanging menu cursor */
+}
+
+/* Time of day */
+:root[data-time='night'] {
+  --t-sky-1: oklch(20% 0.06 275);
+  --t-sky-2: oklch(24% 0.07 272);
+  --t-sky-3: oklch(28% 0.07 268);
+  --t-sky-4: oklch(32% 0.07 262);
+  --t-sky-5: oklch(37% 0.06 255);
+  --t-sea-1: oklch(24% 0.08 262);
+  --t-sea-2: oklch(31% 0.08 256);
+  --t-sea-foam: oklch(62% 0.04 245);
+  --cloud-time: brightness(0.45) saturate(0.6);
+  --ground-time: brightness(0.5) saturate(0.8);
+  --band-ink: oklch(94% 0.02 250);
+}
+
+:root[data-time='dawn'] {
+  --t-sky-1: oklch(58% 0.1 265);
+  --t-sky-2: oklch(68% 0.09 300);
+  --t-sky-3: oklch(76% 0.09 345);
+  --t-sky-4: oklch(83% 0.09 30);
+  --t-sky-5: oklch(90% 0.07 75);
+  --t-sea-1: oklch(48% 0.12 270);
+  --t-sea-2: oklch(60% 0.1 290);
+  --t-sea-foam: oklch(94% 0.04 60);
+  --cloud-time: sepia(0.25) saturate(1.4) hue-rotate(-15deg);
+  --ground-time: brightness(0.85);
+}
+
+:root[data-time='dusk'] {
+  --t-sky-1: oklch(48% 0.13 295);
+  --t-sky-2: oklch(62% 0.14 330);
+  --t-sky-3: oklch(70% 0.14 10);
+  --t-sky-4: oklch(77% 0.14 45);
+  --t-sky-5: oklch(85% 0.12 75);
+  --t-sea-1: oklch(40% 0.12 280);
+  --t-sea-2: oklch(52% 0.13 320);
+  --t-sea-foam: oklch(90% 0.07 60);
+  --cloud-time: sepia(0.4) saturate(1.8) hue-rotate(-25deg) brightness(0.95);
+  --ground-time: brightness(0.75) saturate(0.9);
+}
+
+/* Weather */
+:root[data-weather='cloudy'] {
+  --wl: 0.97;
+  --wc: 0.45;
+  --cloud-weather: grayscale(0.3);
+}
+
+:root[data-weather='rain'] {
+  --wl: 0.85;
+  --wc: 0.25;
+  --cloud-weather: grayscale(0.8) brightness(0.8);
+  --ground-weather: brightness(0.85) saturate(0.8);
+}
+
+:root[data-weather='snow'] {
+  --wl: 1.02;
+  --wc: 0.15;
+  --cloud-weather: grayscale(0.6);
+  --ground-weather: saturate(0.35) brightness(1.3);
+}
+
+:root[data-weather='storm'] {
+  --wl: 0.6;
+  --wc: 0.25;
+  --cloud-weather: grayscale(0.9) brightness(0.55);
+  --ground-weather: brightness(0.7) saturate(0.7);
+  --band-ink: oklch(94% 0.02 250);
 }
 
 *,
@@ -143,7 +237,7 @@ body > main {
   display: flex;
   align-items: center;
   padding-inline: var(--gutter);
-  color: var(--dialog-ink);
+  color: var(--band-ink);
   text-decoration: none;
 }
 
@@ -161,7 +255,7 @@ body > main {
 }
 
 .band-link:focus-visible {
-  outline: var(--px) dashed var(--dialog-ink);
+  outline: var(--px) dashed var(--band-ink);
   outline-offset: calc(var(--px) * -3);
 }
 
@@ -241,7 +335,128 @@ body > main {
   left: 0;
   width: calc(var(--w) * var(--px) * 2);
   height: calc(var(--h) * var(--px) * 2);
+  filter: var(--cloud-time) var(--cloud-weather);
   animation: drift linear infinite;
+}
+
+/* Weather layers: hidden unless the matching state is set on <html>. */
+.stars,
+.precip,
+.flash {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+.stars {
+  bottom: 35%;
+  background: url('/sprites/stars.svg') 0 0 / calc(60 * var(--px) / 2) calc(60 * var(--px) / 2);
+  mask-image: linear-gradient(black 40%, transparent);
+  animation: twinkle 4s steps(2) infinite alternate;
+}
+
+:root[data-time='night']:not([data-weather]) .stars,
+:root[data-time='night'][data-weather='cloudy'] .stars {
+  display: block;
+}
+
+:root[data-weather='cloudy'] .stars {
+  opacity: 0.5;
+}
+
+@keyframes twinkle {
+  to {
+    opacity: 0.7;
+  }
+}
+
+/* Two layers per precipitation type at different sizes and speeds, for depth. */
+.precip::before,
+.precip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  --a: calc(var(--px) / 2);
+  background: var(--tile) 0 0 / calc(var(--tw) * var(--a)) calc(var(--th) * var(--a));
+  animation: fall linear infinite;
+}
+
+.precip::after {
+  --a: calc(var(--px) * 0.75);
+  animation-duration: calc(var(--speed) * 0.7);
+}
+
+.precip::before {
+  opacity: 0.6;
+  animation-duration: var(--speed);
+}
+
+@keyframes fall {
+  to {
+    background-position: calc(var(--drift) * var(--tw) * var(--a)) calc(2 * var(--th) * var(--a));
+  }
+}
+
+:root[data-weather='rain'] .precip,
+:root[data-weather='storm'] .precip {
+  display: block;
+  --tile: url('/sprites/rain.svg');
+  --tw: 24;
+  --th: 36;
+  --drift: 0;
+  --speed: 0.9s;
+}
+
+:root[data-weather='rain'] .precip {
+  opacity: 0.45;
+}
+
+:root[data-weather='storm'] .precip {
+  --speed: 0.6s;
+  opacity: 0.6;
+}
+
+:root[data-weather='snow'] .precip {
+  display: block;
+  --tile: url('/sprites/snow.svg');
+  --tw: 40;
+  --th: 40;
+  --drift: 1;
+  --speed: 14s;
+}
+
+/* Lightning: two quick flashes near the end of each cycle. */
+:root[data-weather='storm'] .flash {
+  display: block;
+  background: white;
+  opacity: 0;
+  animation: lightning 11s infinite;
+}
+
+@keyframes lightning {
+  93% {
+    opacity: 0;
+  }
+  94% {
+    opacity: 0.45;
+  }
+  95% {
+    opacity: 0;
+  }
+  96.5% {
+    opacity: 0.3;
+  }
+  98% {
+    opacity: 0;
+  }
+}
+
+/* Birds stay home at night and in bad weather. */
+:root[data-time='night'] .bird,
+:root[data-weather='rain'] .bird,
+:root[data-weather='storm'] .bird,
+:root[data-weather='snow'] .bird {
+  display: none;
 }
 
 /* bird.svg is 4 frames of 22×15 side by side: up, mid, down, mid. */
@@ -276,6 +491,44 @@ body > main {
 @keyframes bob {
   50% {
     transform: translateY(calc(var(--art) * 3));
+  }
+}
+
+/* bat.svg is 4 frames of 16×8 side by side: up, level, down, level. */
+.bat {
+  --art: calc(var(--px) * var(--scale));
+  position: absolute;
+  left: 0;
+  display: none;
+  width: calc(16 * var(--art));
+  height: calc(8 * var(--art));
+  background: url('/sprites/bat.svg') 0 0 / calc(64 * var(--art)) 100%;
+  animation-name: flutter, fly, swoop;
+  animation-timing-function: steps(4), linear, ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+:root[data-time='night']:not([data-weather]) .bat,
+:root[data-time='night'][data-weather='cloudy'] .bat {
+  display: block;
+}
+
+@keyframes flutter {
+  to {
+    background-position-x: calc(-64 * var(--art));
+  }
+}
+
+/* Uneven dips and climbs so the path looks erratic rather than a smooth wave. */
+@keyframes swoop {
+  20% {
+    transform: translateY(calc(var(--art) * 14));
+  }
+  45% {
+    transform: translateY(calc(var(--art) * -6));
+  }
+  70% {
+    transform: translateY(calc(var(--art) * 10));
   }
 }
 
@@ -316,16 +569,18 @@ h2 {
 
 /* Horizon: foam line, two-tone sea, then the grass sprite tiled over the ground. */
 .ground {
+  position: relative;
   --sea-h: calc(var(--px) * 20);
   --grass-w: calc(32 * var(--px));
   --grass-h: calc(13 * var(--px));
-  height: clamp(8rem, 22vh, 12rem);
+  height: clamp(9rem, 22vh, 12rem); /* room for the foreground tuft (SkyControls) */
   background:
     url('/sprites/grass.svg') 0 calc(var(--sea-h) - var(--px) * 6) / var(--grass-w) var(--grass-h)
       repeat-x,
     linear-gradient(var(--sea-foam) 0 var(--px), transparent 0) 0 0 / 100% var(--sea-h) no-repeat,
     linear-gradient(var(--sea-1) 0 50%, var(--sea-2) 50%) 0 0 / 100% var(--sea-h) no-repeat,
     var(--grass);
+  filter: var(--ground-time) var(--ground-weather);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -343,8 +598,10 @@ h2 {
     translate: var(--x) 0;
   }
 
-  .bird {
-    display: none;
+  .bird,
+  .bat,
+  .flash {
+    display: none !important;
   }
 
   ::view-transition-group(*),

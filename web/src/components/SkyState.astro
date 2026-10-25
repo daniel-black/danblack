@@ -1,0 +1,91 @@
+---
+// Sets <html data-time data-weather> from Denver's current weather (Open-Meteo, no key).
+// No JS or a failed fetch leaves the defaults: clear daytime.
+// Preview any state with ?time=night&weather=snow (sticky for the session; ?time=auto clears),
+// or with the grass easter egg (SkyControls.astro).
+---
+
+<script is:inline>
+  (() => {
+    if (window.__skyState) return;
+    window.__skyState = true;
+
+    const KEY = 'sky-state';
+    const OVERRIDE = 'sky-override';
+    const TTL = 15 * 60 * 1000;
+    const API =
+      'https://api.open-meteo.com/v1/forecast?latitude=39.74&longitude=-104.99' +
+      '&current=weather_code&daily=sunrise,sunset&timezone=America%2FDenver&forecast_days=1';
+
+    const load = (key) => {
+      try {
+        return JSON.parse(sessionStorage.getItem(key) || 'null');
+      } catch {
+        return null;
+      }
+    };
+    const save = (key, value) => {
+      try {
+        sessionStorage.setItem(key, JSON.stringify(value));
+      } catch {}
+    };
+
+    // WMO weather codes: https://open-meteo.com/en/docs#weather_variable_documentation
+    const weatherOf = (code) => {
+      if (code >= 95) return 'storm';
+      if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'snow';
+      if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return 'rain';
+      if (code >= 2) return 'cloudy';
+      return 'clear';
+    };
+
+    // Times are Denver-local strings; parsing all three the same way keeps the math consistent.
+    const timeOf = (now, sunrise, sunset) => {
+      const [t, rise, set] = [now, sunrise, sunset].map((s) => new Date(s).getTime());
+      const twilight = 45 * 60 * 1000;
+      if (Math.abs(t - rise) <= twilight) return 'dawn';
+      if (Math.abs(t - set) <= twilight) return 'dusk';
+      return t > rise && t < set ? 'day' : 'night';
+    };
+
+    const params = new URLSearchParams(location.search);
+    if (params.has('time') || params.has('weather')) {
+      const o = { time: params.get('time'), weather: params.get('weather') };
+      if (o.time === 'auto' || o.weather === 'auto') sessionStorage.removeItem(OVERRIDE);
+      else save(OVERRIDE, o);
+    }
+
+    const apply = () => {
+      const cached = load(KEY);
+      const override = load(OVERRIDE) || {};
+      const state = { ...(cached && cached.state) };
+      for (const k of ['time', 'weather']) if (override[k]) state[k] = override[k];
+      const root = document.documentElement;
+      for (const k of ['time', 'weather']) {
+        const v = state[k];
+        if (v && v !== 'day' && v !== 'clear') root.dataset[k] = v;
+        else delete root.dataset[k];
+      }
+    };
+
+    apply();
+    // The client router replaces <html> attributes on navigation; put ours back.
+    document.addEventListener('astro:after-swap', apply);
+    // Lets SkyControls.astro re-apply after changing the override.
+    document.addEventListener('sky:refresh', apply);
+
+    const cached = load(KEY);
+    if (cached && Date.now() - cached.at < TTL) return;
+    fetch(API)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((d) => {
+        const state = {
+          weather: weatherOf(d.current.weather_code),
+          time: timeOf(d.current.time, d.daily.sunrise[0], d.daily.sunset[0]),
+        };
+        save(KEY, { at: Date.now(), state });
+        apply();
+      })
+      .catch(() => {});
+  })();
+</script>

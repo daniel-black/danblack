@@ -15,9 +15,17 @@ const birds = [
   { top: '22%', scale: 0.5, loop: 75, delay: -40 },
   { top: '9%', scale: 0.625, loop: 110, delay: -80 },
 ];
+
+// Night only: bats flutter and swoop; `reverse` flies left to right.
+const bats = [
+  { top: '10%', scale: 0.75, loop: 22, delay: -3, swoop: 3.2, reverse: false },
+  { top: '20%', scale: 0.5, loop: 30, delay: -16, swoop: 2.6, reverse: true },
+  { top: '6%', scale: 0.625, loop: 38, delay: -27, swoop: 3.8, reverse: false },
+];
 ---
 
-<div class="sky-life" aria-hidden="true" transition:persist>
+<div class="sky-life" aria-hidden="true" transition:persist="sky-life">
+  <div class="stars"></div>
   {
     clouds.map((c) => (
       <img
@@ -38,4 +46,14 @@ const birds = [
       />
     ))
   }
+  {
+    bats.map((b) => (
+      <div
+        class="bat"
+        style={`top: ${b.top}; --scale: ${b.scale}; animation-duration: 0.28s, ${b.loop}s, ${b.swoop}s; animation-delay: 0s, ${b.delay}s, 0s; animation-direction: normal, ${b.reverse ? 'reverse' : 'normal'}, normal`}
+      />
+    ))
+  }
+  <div class="precip"></div>
+  <div class="flash"></div>
 </div>

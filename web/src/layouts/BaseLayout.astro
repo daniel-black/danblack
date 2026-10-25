@@ -2,6 +2,8 @@
 import { Font } from 'astro:assets';
 import { ClientRouter } from 'astro:transitions';
 import Sky from '../components/Sky.astro';
+import SkyControls from '../components/SkyControls.astro';
+import SkyState from '../components/SkyState.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -40,10 +42,13 @@ const ogImage = new URL(image, Astro.site);
 
     <meta name="generator" content={Astro.generator} />
     <ClientRouter />
+    <SkyState />
   </head>
   <body>
     <Sky />
     <slot />
-    <footer class="ground" transition:persist></footer>
+    <footer class="ground" transition:persist="ground">
+      <SkyControls />
+    </footer>
   </body>
 </html>

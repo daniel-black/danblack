@@ -644,6 +644,76 @@ h2 {
   font-size: 0.8em;
 }
 
+/* Interactive audio player in posts (islands/ToneDemo.tsx). */
+.tone-demo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 2rem;
+  padding: 1rem 1.25rem;
+  background: oklch(from var(--dialog-bg) calc(l - 0.03) c h);
+  border: 2px solid var(--dialog-ink);
+  border-radius: var(--px);
+  font-family: var(--font-pixel);
+}
+
+.tone-play {
+  min-width: 6.5rem;
+  padding: 0.5rem 1rem;
+  font: inherit;
+  color: var(--dialog-bg);
+  background: var(--dialog-ink);
+  border: 0;
+  border-radius: var(--px);
+  cursor: pointer;
+}
+
+.tone-play:hover {
+  background: oklch(from var(--dialog-ink) calc(l + 0.1) c h);
+}
+
+.tone-play:focus-visible,
+.tone-demo input:focus-visible {
+  outline: 2px dashed var(--dialog-ink);
+  outline-offset: 2px;
+}
+
+.tone-duty {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.tone-duty legend {
+  margin-bottom: 0.25rem;
+  font-size: 0.875em;
+  opacity: 0.7;
+}
+
+.tone-duty label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+}
+
+.tone-demo input {
+  accent-color: var(--dialog-frame);
+}
+
+.tone-volume {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.875em;
+}
+
+.tone-volume input {
+  width: 10rem;
+}
+
 /* Pixel-font pills for tags and skills. */
 .chips {
   display: flex;

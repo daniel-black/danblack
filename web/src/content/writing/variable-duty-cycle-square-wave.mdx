@@ -1,0 +1,127 @@
+---
+title: Creating variable duty cycle square waves with the Web Audio API
+description: To faithfully recreate the sounds of the Gameboy, I need variable duty cycle square waves.
+pubDate: 2025-04-02
+updatedDate: 2025-04-07
+---
+
+import ToneDemo from '../../islands/ToneDemo.tsx';
+
+Lately, I've been playing around with the [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API) for a side project I'm working on. I am building a web-based [music tracker software](https://en.wikipedia.org/wiki/Music_tracker) for creating [audio in the original style of the Gameboy.](https://gbdev.io/pandocs/Audio.html) To faithfully recreate the sounds of the Gameboy, I need variable duty cycle square waves.
+
+The iconic 8-bit, chiptune style of music is heavily reliant on square waves. The Web Audio API allows you to create `OscillatorNode`s that represent periodic waveforms like a sine, sawtooth, triangle, or square waves.
+
+```ts
+const ctx = new AudioContext();
+
+const osc = new OscillatorNode(ctx, {
+  type: "square",
+});
+```
+
+Here is what an A4 sounds like with a 50% duty cycle square wave:
+
+<ToneDemo client:visible method="square" />
+
+Not the most pleasant musical thing you've ever heard but you get the gist.
+
+Seems like we have our square wave, pretty easy right? Unfortunately no, not quite. Oscillators with the type "square" only allow for a duty cycle of 50%. This means that for one cycle, the wave is high for half the time and low for the other half.
+
+One of the neat things about the Gameboy was that its two pulse channels allowed for variable duty cycles. Specifically, the duty cycle could be set to 12.5%, 25%, 50% or 75%. This allowed game developers to create richer, more textured sounds for their games.
+
+To get around this 50%-duty-cycle limitation of the Web Audio API, I had to find a way to create square waves from a different type of periodic waveform.
+
+We have a couple of options. One approach is to use the Fourier Series. Another is to use a `WaveShaperNode` to bend a sawtooth wave into the desired duty cycle square wave. First, let's take a look at the Fourier Series.
+
+## The Fourier Series Approach
+
+In short, the Fourier Series is a way to represent a periodic function or waveform as an infinite sum of sines and cosines. It is like building up waves from harmonics like lego bricks. Basically, we can do a little bit of math to create a periodic waveform that we can shape an `OscillatorNode`'s output with. The Web Audio API exposes a function on the `AudioContext` that we can use to create a periodic waveform from a set of Fourier coefficients. This is how that looks.
+
+```ts
+// Create your audio context & oscillator
+const ctx = new AudioContext();
+const osc = new OscillatorNode(ctx);
+osc.frequency.value = 440; // A4 = 440Hz
+
+// Configure your desired duty cycle & number of harmonics
+const dutyCycle = 0.25;
+const harmonics = 64; // More harmonics = more accurate square wave
+
+// Create arrays for real and imaginary parts of Fourier coefficients
+const real = new Float32Array(harmonics);
+const imag = new Float32Array(harmonics);
+
+// DC offset (average value based on duty cycle)
+real[0] = 2 * dutyCycle - 1;
+imag[0] = 0;
+
+// Calculate harmonic amplitudes for desired duty cycle
+for (let n = 1; n < harmonics; n++) {
+    // Cosine terms are zero for square waves
+    real[n] = 0;
+
+    // Sine terms follow this formula for duty cycle D:
+    imag[n] = (2 / (n * Math.PI)) * Math.sin(n * dutyCycle * Math.PI * 2);
+}
+
+// Create a periodic wave from our Fourier coefficients
+const wave = ctx.createPeriodicWave(real, imag, {
+    disableNormalization: false
+});
+
+// Set the oscillator to use our custom wave
+osc.setPeriodicWave(wave);
+```
+
+Now we have a square wave oscillator with a duty cycle of 25% or whatever we would like to set it as.
+
+Here is what square waves with variable duty cycles sound like when created with the Fourier Series approach.
+
+<ToneDemo client:visible method="fourier" />
+
+This approach is a little more math heavy than the next - the next method is a little bit more intuitive to grasp.
+
+## The WaveShaper Approach
+
+The Web Audio API provides us with a way to distort signals. This is the `WaveShaperNode`. When creating audio with the Web Audio API, you connect audio nodes in a graph. Typically it will be something like this:
+
+`OscillatorNode` → `GainNode` → `AudioDestinationNode`
+
+The `WaveShaperNode` lets us transform the output from something like an `OscillatorNode`. We can do a fun little thing with a sawtooth wave where we create a step function to bracket the value to either 0 or 1 depending on where it falls in relation to the duty cycle point.
+
+```ts
+const ctx = new AudioContext();
+const osc = new OscillatorNode(ctx, {
+  type: "sawtooth",
+});
+
+const dutyCycle = 0.125;
+
+// Create the waveshaper
+const waveShaper = new WaveShaperNode(ctx);
+
+// Create the transfer function that shapes the wave
+const curveLength = 2048;
+const curve = new Float32Array(curveLength);
+
+// The magic happens here - create a step function at the duty cycle point
+for (let i = 0; i < curveLength; i++) {
+    const x = i / (curveLength - 1);  // Normalize to 0-1 range
+    curve[i] = x < dutyCycle ? 1.0 : -1.0; // Step function
+}
+
+waveShaper.curve = curve;
+osc.connect(waveShaper);
+```
+
+From here, we can connect the `waveShaper` to an output node and now we have a square wave of whatever duty cycle we like. I prefer this approach because of how simple and easy it is to grasp.
+
+Here is what square waves with variable duty cycles sound like when created with the Waveshaper approach.
+
+<ToneDemo client:visible method="waveshaper" />
+
+You might notice that the square waves created with the Waveshaper approach sound "buzzier" than the Fourier Series approach. This is because the Waveshaper approach creates an almost mathematically perfect square wave with extremely sharp transitions.
+
+There are pros and cons to each approach. One of the cons of the Fourier Series approach is that you need a lot of harmonics for it to sound decent, which is costly in CPU cycles. This is especially true if your application supports any duty cycle between 0% and 100% and calculates the curve on the fly. The nice thing about the music tracker software that I am working on is that I only need to support four duty cycles so I can compute my waveShaper curves once ahead of time and reuse them throughout the application. One of the downsides of the Waveshaper approach is that you start running into aliasing and buzziness.
+
+For my purposes, the Waveshaper approach is my preferred method. I like the simplicity of it and I also believe that it creates a more authentic Gameboy sound. This is just the tip of the iceberg as it relates to the Web Audio API - I really do think there is a lot of potential for building cool things with this tool and more devs should check it out.

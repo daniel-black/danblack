@@ -21,6 +21,8 @@ const { title, description, band, slug, article } = Astro.props;
     style={`--c: var(${band})`}
     transition:name={slug ? `band-${slug}` : undefined}
   />
+  <!-- Optional full-screen scene behind the page (e.g. orbit on an experience page). -->
+  <slot name="backdrop" />
   <header class="site-header">
     <a class="site-title site-title-sm" href="/" transition:name="site-title">Dan Black</a>
   </header>

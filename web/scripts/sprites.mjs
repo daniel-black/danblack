@@ -2,6 +2,7 @@
 // Run `pnpm sprites` to regenerate public/sprites/*.svg after editing.
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import * as earth from './earth.mjs';
 
 const out = fileURLToPath(new URL('../public/sprites', import.meta.url));
 mkdirSync(out, { recursive: true });
@@ -175,7 +176,121 @@ const carrierPalette = {
   G: '#8a929c', g: '#6a727c', d: '#454c56', I: '#a0a8b2', w: '#2a3038', P: '#c8ccd2', R: '#d04040',
 };
 
+// Small canvas helper for sprites that are easier to draw with code than by hand.
+const canvas = (w, h) => {
+  const px = Array.from({ length: h }, () => Array(w).fill('.'));
+  const set = (x, y, ch) => {
+    if (x >= 0 && y >= 0 && x < w && y < h) px[y][x] = ch;
+  };
+  const rect = (x, y, rw, rh, ch) => {
+    for (let j = 0; j < rh; j++) for (let i = 0; i < rw; i++) set(x + i, y + j, ch);
+  };
+  const stamp = (rows, x, y) => rows.forEach((row, j) => [...row].forEach((ch, i) => ch !== '.' && set(x + i, y + j, ch)));
+  return { set, rect, stamp, toString: () => px.map((r) => r.join('')).join('\n') };
+};
+
+// Highway scene (HighwayScene.astro): a side-view semi, distant hills, prairie, and poles.
+const semiPalette = {
+  K: '#2a2e38', W: '#f4f2ec', w: '#cfd2d8', O: '#f0a030', R: '#d04a3a', r: '#a03428',
+  S: '#8ac8f0', s: '#d8f0ff', C: '#c0c6d0', T: '#22262e', t: '#9aa0aa', L: '#fff4a0', X: '#5a5e66',
+};
+const tire = ['.TTTT.', 'TTttTT', 'TtTTtT', 'TtTTtT', 'TTttTT', '.TTTT.'];
+const semiArt = (() => {
+  const c = canvas(60, 21);
+  // Trailer: white box with an orange stripe, on a dark chassis.
+  c.rect(0, 1, 40, 14, 'K');
+  c.rect(1, 2, 38, 12, 'W');
+  c.rect(1, 12, 38, 1, 'w');
+  c.rect(1, 9, 38, 2, 'O');
+  c.rect(2, 15, 38, 1, 'K');
+  c.rect(31, 16, 1, 3, 'X'); // landing gear
+  // Tractor: sleeper, cab, windshield, exhaust stack, chrome grille and bumper.
+  c.rect(41, 0, 2, 7, 'X');
+  c.rect(43, 3, 9, 13, 'K');
+  c.rect(44, 4, 8, 11, 'R');
+  c.rect(51, 6, 9, 10, 'K');
+  c.rect(51, 7, 8, 8, 'R');
+  c.rect(52, 7, 6, 4, 'S');
+  c.rect(52, 7, 2, 1, 's');
+  c.rect(44, 13, 15, 2, 'r');
+  c.rect(59, 10, 1, 5, 'C');
+  c.set(59, 11, 'L');
+  c.rect(43, 16, 17, 1, 'C');
+  c.rect(40, 15, 4, 1, 'K'); // fifth wheel
+  // Wheels: trailer tandem at the back, drive tandem under the sleeper, steer axle up front.
+  for (const x of [3, 10, 37, 44, 53]) c.stamp(tire, x, 15);
+  return c.toString();
+})();
+
+// Rolling hills on the horizon, two layers, tiling horizontally (128 wide).
+const hillsPalette = { F: '#a8cbbf', N: '#86b48e' };
+const hillsArt = (() => {
+  const w = 128;
+  const h = 18;
+  const c = canvas(w, h);
+  const wave = (x, a, b, phase) =>
+    Math.sin((x / w) * Math.PI * 2 * a + phase) * 0.5 + Math.sin((x / w) * Math.PI * 2 * b + phase * 2) * 0.35;
+  for (let x = 0; x < w; x++) {
+    const far = Math.round(8 + wave(x, 2, 5, 0.4) * 5);
+    const near = Math.round(12 + wave(x, 3, 7, 1.9) * 4);
+    c.rect(x, far, 1, h - far, 'F');
+    c.rect(x, near, 1, h - near, 'N');
+  }
+  return c.toString();
+})();
+
+// Prairie grass edge: golden-green tufts over a flat band (tiles horizontally).
+const prairiePalette = { P: '#b4c864', p: '#9cb454', y: '#d4d27a' };
+const prairieArt = `
+......y.........p.......y.......
+.....yp....y...pP......yP...y...
+..p..PP...yP...PP..p...PP..yP..p
+.pPp.PPp.pPPp.pPPp.PPp.PPp.PPppP
+PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+PPPpPPPPPPpPPPPPPPPpPPPPPPPpPPPP`;
+
+// Telephone pole with a crossbar, centered in a 48-wide cell so poles repeat at intervals.
+const polePalette = { B: '#6a4a30', b: '#8a6440', K: '#3a3440' };
+const poleArt = (() => {
+  const c = canvas(48, 30);
+  c.rect(23, 0, 2, 30, 'B');
+  c.rect(23, 0, 1, 30, 'b');
+  c.rect(18, 3, 12, 2, 'B');
+  for (const x of [18, 21, 26, 29]) c.set(x, 2, 'K');
+  return c.toString();
+})();
+
+// Satellites (SpaceScene.astro). Big one: gold-foil bus, antenna dish, framed solar wings.
+const satellitePalette = {
+  K: '#2a2e3a', L: '#c4cad6', B: '#23407e', b: '#4e78c8', G: '#e0a838', g: '#f8dc80', d: '#a87020',
+  S: '#8a92a4', W: '#f0f2f8',
+};
+const panel = ['LLLLLLLLL', 'LBbBLBbBL', 'LbBbLbBbL', 'LLLLLLLLL', 'LBbBLBbBL', 'LbBbLbBbL', 'LLLLLLLLL'];
+const satelliteArt = (() => {
+  const c = canvas(29, 10);
+  c.stamp(['..W..', '.WSW.', 'WS.SW', '..S..'], 12, 0); // dish on a mast
+  c.stamp(panel, 0, 3);
+  c.stamp(panel, 20, 3);
+  c.rect(9, 6, 2, 1, 'S');
+  c.rect(18, 6, 2, 1, 'S');
+  c.stamp(['.KKKKKKK.', 'KgGGGGGdK', 'KGgGGGGdK', 'KGGgGGGdK', 'KGGGgGGdK', '.KKKKKKK.'], 10, 4);
+  return c.toString();
+})();
+// CubeSat: small boxy body with two little wings.
+const cubesatArt = `
+LLLL.......LLLL
+LBbL.KKKKK.LbBL
+LbBLSKgGdKSLBbL
+LBbL.KGgdK.LbBL
+LLLL.KKKKK.LLLL`;
+
 const sprites = {
+  semi: [semiPalette, semiArt],
+  hills: [hillsPalette, hillsArt],
+  prairie: [prairiePalette, prairieArt],
+  pole: [polePalette, poleArt],
+  satellite: [satellitePalette, satelliteArt],
+  cubesat: [satellitePalette, cubesatArt],
   sailboat: [boatPalette, `
 .........MF.........
 .........MFF........
@@ -409,4 +524,11 @@ for (const [name, [palette, art]] of Object.entries(sprites)) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${rows.length}" width="${w}" height="${rows.length}" shape-rendering="crispEdges">${rects.join('')}</svg>\n`;
   writeFileSync(`${out}/${name}.svg`, svg);
   console.log(name, `${w}x${rows.length}`, rects.length, 'rects');
+}
+
+// The rotating Earth is a PNG strip of frames (see earth.mjs).
+{
+  const file = earth.png(earth.strip());
+  writeFileSync(`${out}/earth.png`, file);
+  console.log('earth', `${earth.FRAMES} frames of ${earth.SIZE}x${earth.SIZE}`, `${(file.length / 1024).toFixed(1)} KB`);
 }

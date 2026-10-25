@@ -1,0 +1,112 @@
+---
+// Re-entry: when you navigate away from the orbit page (SpaceScene), the next page opens
+// under this overlay, which falls from the starfield back through the sky bands, past the
+// clouds, and reveals the page. A navigation hook marks the incoming page; the overlay
+// removes the mark when it finishes.
+
+// top: position within the strip (%); left: vw; size: screen pixels per cloud pixel.
+const clouds = [
+  { src: 'cloud-sm', top: 54, left: 62, size: 12 },
+  { src: 'cloud-lg', top: 62, left: 10, size: 12 },
+  { src: 'cloud-sm', top: 70, left: 40, size: 10 },
+  { src: 'cloud-lg', top: 78, left: 58, size: 10 },
+  { src: 'cloud-sm', top: 86, left: 18, size: 8 },
+];
+---
+
+<div class="descent" aria-hidden="true">
+  <div class="strip">
+    <div class="space-stars"></div>
+    {
+      clouds.map((c) => (
+        <img
+          src={`/sprites/${c.src}.svg`}
+          alt=""
+          style={`top: ${c.top}%; left: ${c.left}vw; width: calc(${c.src === 'cloud-lg' ? 32 : 16} * ${c.size}px)`}
+        />
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  document.addEventListener('astro:before-swap', (e) => {
+    const leavingOrbit = document.querySelector('.space') && !e.newDocument.querySelector('.space');
+    if (leavingOrbit && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      e.newDocument.documentElement.dataset.descent = '';
+    }
+  });
+
+  document.addEventListener('animationend', (e) => {
+    if (e.animationName === 'reentry') delete document.documentElement.dataset.descent;
+  });
+</script>
+
+<style>
+  .descent {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  :global(:root[data-descent]) .descent {
+    display: block;
+    animation: rumble 1.3s linear both;
+  }
+
+  /* A tall strip read top to bottom: space, then the sky bands, then nothing (the page).
+     It slides up past the camera, slowly at first, then fast as we fall back to the ground. */
+  .strip {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 260vh;
+    background: linear-gradient(
+      to bottom,
+      #05060f 0 32%,
+      #0b1030 32% 38%,
+      #16245a 38% 44%,
+      var(--sky-1) 44% 54%,
+      var(--sky-2) 54% 64%,
+      var(--sky-3) 64% 73%,
+      var(--sky-4) 73% 82%,
+      var(--sky-5) 82% 90%,
+      transparent 90%
+    );
+    animation: reentry 1.8s cubic-bezier(0.5, 0, 0.2, 1) both;
+  }
+
+  .space-stars {
+    position: absolute;
+    inset: 0 0 68%;
+    background: url('/sprites/stars.svg') 0 0 / calc(60 * var(--px) / 2) calc(60 * var(--px) / 2);
+  }
+
+  .strip img {
+    position: absolute;
+    height: auto;
+    image-rendering: pixelated;
+  }
+
+  @keyframes reentry {
+    to {
+      translate: 0 -100%;
+    }
+  }
+
+  /* Re-entry buffeting through the upper atmosphere, settling as we land. */
+  @keyframes rumble {
+    0%, 20% { translate: 0 0; }
+    25% { translate: -2px 1px; }
+    30% { translate: 2px -1px; }
+    35% { translate: -3px 2px; }
+    40% { translate: 3px -1px; }
+    45% { translate: -2px -2px; }
+    50% { translate: 2px 1px; }
+    60% { translate: -1px 1px; }
+    70% { translate: 1px -1px; }
+    80%, 100% { translate: 0 0; }
+  }
+</style>

@@ -18,4 +18,31 @@ const writing = defineCollection({
   }),
 });
 
-export const collections = { writing };
+// Jobs are Markdown files in src/content/experience; the filename is the URL slug.
+const experience = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/experience' }),
+  schema: z.object({
+    company: z.string(),
+    /** The product you worked on, if different from the company. */
+    product: z.string().optional(),
+    url: z.url(),
+    /** One or two sentences for the overview card and link previews. */
+    summary: z.string(),
+    /** Newest first. Leave `end` off the current role. */
+    roles: z
+      .array(
+        z.object({
+          title: z.string(),
+          start: z.coerce.date(),
+          end: z.coerce.date().optional(),
+        }),
+      )
+      .min(1),
+    /** The backdrop scene on the job's page. */
+    scene: z.enum(['space', 'highway']),
+    /** Label for the link from the overview, e.g. "Fly up to orbit". */
+    cta: z.string(),
+  }),
+});
+
+export const collections = { writing, experience };

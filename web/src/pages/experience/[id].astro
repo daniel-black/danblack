@@ -1,0 +1,65 @@
+---
+import { render } from 'astro:content';
+import SpaceScene from '../../components/SpaceScene.astro';
+import HighwayScene from '../../components/HighwayScene.astro';
+import SectionLayout from '../../layouts/SectionLayout.astro';
+import { formatRange, getJobs } from '../../experience.ts';
+
+export async function getStaticPaths() {
+  const jobs = await getJobs();
+  return jobs.map((job) => ({ params: { id: job.id }, props: { job } }));
+}
+
+const { job } = Astro.props;
+const { Content } = await render(job);
+const { company, product, url, summary, roles, scene } = job.data;
+---
+
+<SectionLayout title={product ? `${product} at ${company}` : company} description={summary} band="--sky-4" slug="experience">
+  {scene === 'space' && <SpaceScene slot="backdrop" />}
+  {scene === 'highway' && <HighwayScene slot="backdrop" />}
+  <p class="meta">
+    <a href={url} target="_blank" rel="noreferrer">{company}</a>
+  </p>
+  <ul class="roles">
+    {
+      roles.map((r) => (
+        <li>
+          <span>{r.title}</span>
+          <span class="dates">{formatRange(r.start, r.end)}</span>
+        </li>
+      ))
+    }
+  </ul>
+  <Content />
+  <p class="back"><a href="/experience">← All experiences</a></p>
+</SectionLayout>
+
+<style>
+  .meta {
+    font-size: 0.875em;
+  }
+
+  .roles {
+    padding: 0;
+    list-style: none;
+  }
+
+  .roles li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0 1rem;
+    margin: 0;
+  }
+
+  .dates {
+    font-size: 0.875em;
+    opacity: 0.7;
+  }
+
+  .back {
+    padding-top: 1rem;
+    font-family: var(--font-pixel);
+  }
+</style>

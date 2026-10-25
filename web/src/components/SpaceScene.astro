@@ -1,0 +1,355 @@
+---
+// Orbit backdrop for the True Anomaly page, with a launch on arrival (~3s):
+//   ignition: the camera shakes and the sky starts to slide
+//   launch: the climb accelerates and the clouds rush past
+//   space: the sky goes black and the stars slide in and settle
+//   orbit: Earth falls away below (huge, shrinking into place), then orbits and satellites
+//          fade in; the text box glides in last.
+// Each orbit is an ellipse from two eased back-and-forth motions a quarter-cycle apart;
+// z-index flips at the ends so a satellite passes behind Earth on the far side.
+
+// rx/ry: orbit radii as a fraction of Earth's frame size. period in seconds. tilt in degrees.
+const satellites = [
+  { sprite: 'satellite', w: 29, h: 10, rx: 0.74, ry: 0.2, period: 30, tilt: -16, delay: 0 },
+  { sprite: 'cubesat', w: 15, h: 5, rx: 0.9, ry: 0.3, period: 42, tilt: 12, delay: -16 },
+  { sprite: 'satellite', w: 29, h: 10, rx: 0.62, ry: 0.4, period: 22, tilt: -48, delay: -8 },
+];
+
+// Clouds painted into the climbing sky, so they rush past on the way up.
+// top: position within the sky strip (%); left: vw; size: art pixels per cloud pixel.
+const clouds = [
+  { src: 'cloud-lg', top: 52, left: 8, size: 8 },
+  { src: 'cloud-sm', top: 60, left: 64, size: 8 },
+  { src: 'cloud-lg', top: 68, left: 40, size: 10 },
+  { src: 'cloud-sm', top: 76, left: 12, size: 10 },
+  { src: 'cloud-lg', top: 84, left: 70, size: 12 },
+  { src: 'cloud-sm', top: 91, left: 30, size: 12 },
+];
+---
+
+<div class="scene space" aria-hidden="true">
+  <div class="shake">
+    <div class="starfield"></div>
+    <div class="system">
+      {
+        satellites.map((s) => (
+          <>
+            <div class="ring back" style={`--rx: ${s.rx}; --ry: ${s.ry}; --tilt: ${s.tilt}deg`} />
+            <div class="ring front" style={`--rx: ${s.rx}; --ry: ${s.ry}; --tilt: ${s.tilt}deg`} />
+          </>
+        ))
+      }
+      <div class="earth"></div>
+      {
+        satellites.map((s) => (
+          <div
+            class="sat"
+            style={`--rx: ${s.rx}; --ry: ${s.ry}; --tilt: ${s.tilt}deg; --period: ${s.period}s; --delay: ${s.delay}s`}
+          >
+            <div class="sat-x">
+              <div class="sat-y">
+                <img
+                  src={`/sprites/${s.sprite}.svg`}
+                  alt=""
+                  width={s.w}
+                  height={s.h}
+                  style={`--w: ${s.w}; --h: ${s.h}`}
+                />
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+    <div class="climb">
+      {
+        clouds.map((c) => (
+          <img
+            src={`/sprites/${c.src}.svg`}
+            alt=""
+            style={`top: ${c.top}%; left: ${c.left}vw; width: calc(${c.src === 'cloud-lg' ? 32 : 16} * ${c.size}px)`}
+          />
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  /* Night-mode text box up here. Only the dialog's palette changes, so links, chips,
+     buttons, and quotes follow along; the site title outside it is untouched. It glides in
+     once the launch reaches orbit. */
+  :root:has(.space) .dialog {
+    --dialog-bg: oklch(21% 0.035 265);
+    --dialog-ink: oklch(92% 0.02 250);
+    --dialog-frame: oklch(62% 0.12 235);
+    color: var(--dialog-ink);
+    animation: arrive 0.7s 2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  @keyframes arrive {
+    from {
+      opacity: 0;
+      translate: 0 1.5rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root:has(.space) .dialog {
+      animation: none;
+    }
+  }
+</style>
+
+<style>
+  .space {
+    --epx: 3px; /* one Earth art pixel */
+    --earth: calc(100 * var(--epx)); /* one frame of earth.png */
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    background: #05060f;
+  }
+
+  @media (min-width: 64rem) {
+    .space {
+      --epx: 4px;
+    }
+  }
+
+  @media (min-width: 90rem) {
+    .space {
+      --epx: 5px;
+    }
+  }
+
+  .shake {
+    position: absolute;
+    inset: 0;
+    animation: shake 1.9s linear both;
+  }
+
+  /* Ignition rumble: builds quickly, then fades as the climb smooths out. */
+  @keyframes shake {
+    0% { translate: 0 0; }
+    5% { translate: 1px -1px; }
+    10% { translate: -2px 1px; }
+    15% { translate: 2px 2px; }
+    20% { translate: -3px -1px; }
+    25% { translate: 3px 1px; }
+    30% { translate: -3px 2px; }
+    35% { translate: 2px -2px; }
+    40% { translate: -3px 1px; }
+    45% { translate: 3px -1px; }
+    50% { translate: -2px 2px; }
+    55% { translate: 2px -1px; }
+    60% { translate: -2px 1px; }
+    70% { translate: 1px -1px; }
+    80% { translate: -1px 1px; }
+    90% { translate: 1px 0; }
+    100% { translate: 0 0; }
+  }
+
+  .starfield {
+    position: absolute;
+    inset: -20% 0 0;
+    background: url('/sprites/stars.svg') 0 0 / calc(60 * var(--px) / 2) calc(60 * var(--px) / 2);
+    animation: stars-in 1.6s 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  /* Stars streak down into place as the climb slows. */
+  @keyframes stars-in {
+    from {
+      opacity: 0;
+      translate: 0 -15%;
+    }
+  }
+
+  /* Earth sits in the bottom-right corner, partly off screen, so it shows beside and below
+     the text box rather than behind it. */
+  .system {
+    position: absolute;
+    right: calc(var(--earth) * -0.1);
+    bottom: calc(var(--earth) * -0.3);
+    width: var(--earth);
+    height: var(--earth);
+    isolation: isolate;
+    animation: fall-away 1.9s 1.35s cubic-bezier(0.16, 0.84, 0.24, 1) both; /* after the sky clears */
+  }
+
+  /* The planet starts huge just below the screen and shrinks as we pull away from it. */
+  @keyframes fall-away {
+    from {
+      translate: -20% 70%;
+      scale: 2.4;
+    }
+  }
+
+  /* earth.png: 60 frames of 100×100, one full turn per minute. */
+  .earth {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: url('/sprites/earth.png') 0 0 / calc(var(--earth) * 60) 100%;
+    image-rendering: pixelated;
+    animation: spin 60s steps(60) infinite;
+  }
+
+  @keyframes spin {
+    to {
+      background-position-x: calc(var(--earth) * -60);
+    }
+  }
+
+  /* Dashed orbit line, split so its near half draws in front of Earth. */
+  .ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: calc(var(--earth) * var(--rx) * 2);
+    height: calc(var(--earth) * var(--ry) * 2);
+    translate: -50% -50%;
+    rotate: var(--tilt);
+    border: 2px dashed oklch(85% 0.05 230 / 0.28);
+    border-radius: 50%;
+    animation: fade-in 0.8s 2.5s both;
+  }
+
+  .ring.back {
+    z-index: 0;
+    clip-path: inset(0 0 50% 0);
+  }
+
+  .ring.front {
+    z-index: 2;
+    clip-path: inset(50% 0 0 0);
+  }
+
+  .sat {
+    --x: calc(var(--earth) * var(--rx));
+    --y: calc(var(--earth) * var(--ry));
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    rotate: var(--tilt);
+    animation: orbit-z var(--period) step-end var(--delay) infinite;
+  }
+
+  .sat-x {
+    animation: orbit-x calc(var(--period) / 2) ease-in-out calc(var(--delay) - var(--period) / 4) infinite alternate;
+  }
+
+  .sat-y {
+    animation: orbit-y calc(var(--period) / 2) ease-in-out var(--delay) infinite alternate;
+  }
+
+  .sat img {
+    display: block;
+    width: calc(var(--w) * 3px);
+    height: calc(var(--h) * 3px);
+    translate: -50% -50%;
+    rotate: calc(var(--tilt) * -1); /* keep the panels level */
+    animation: fade-in 0.8s 2.6s both;
+  }
+
+  @keyframes orbit-x {
+    from {
+      transform: translateX(calc(var(--x) * -1));
+    }
+    to {
+      transform: translateX(var(--x));
+    }
+  }
+
+  @keyframes orbit-y {
+    from {
+      transform: translateY(calc(var(--y) * -1));
+    }
+    to {
+      transform: translateY(var(--y));
+    }
+  }
+
+  /* Far half of the orbit (top) is behind Earth, near half (bottom) in front. */
+  @keyframes orbit-z {
+    0% {
+      z-index: 0;
+    }
+    25% {
+      z-index: 2;
+    }
+    75% {
+      z-index: 0;
+    }
+  }
+
+  /* The climb: a tall strip of sky slides down out of view, slowly at first, then fast,
+     easing off at the top: the camera launching up past the clouds into space. */
+  .climb {
+    position: absolute;
+    inset: auto 0 0;
+    height: 260vh;
+    background: linear-gradient(
+      to bottom,
+      transparent 0 26%,
+      #0b1030 26% 34%,
+      #16245a 34% 42%,
+      var(--sky-1) 42% 54%,
+      var(--sky-2) 54% 66%,
+      var(--sky-3) 66% 77%,
+      var(--sky-4) 77% 88%,
+      var(--sky-5) 88%
+    );
+    animation: climb 2.3s cubic-bezier(0.72, 0, 0.24, 1) both;
+  }
+
+  .climb img {
+    position: absolute;
+    height: auto;
+    image-rendering: pixelated;
+  }
+
+  @keyframes climb {
+    to {
+      translate: 0 100%;
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .climb {
+      display: none;
+    }
+
+    .shake,
+    .starfield,
+    .system,
+    .ring,
+    .sat img,
+    .earth {
+      animation: none;
+    }
+
+    /* Parked at fixed points on their orbits. */
+    .sat {
+      animation: none;
+      z-index: 2;
+    }
+
+    .sat-x {
+      animation: none;
+      transform: translateX(calc(var(--x) * -0.7));
+    }
+
+    .sat-y {
+      animation: none;
+      transform: translateY(calc(var(--y) * 0.7));
+    }
+  }
+</style>

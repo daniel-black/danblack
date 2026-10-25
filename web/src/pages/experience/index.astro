@@ -1,0 +1,111 @@
+---
+import SectionLayout from '../../layouts/SectionLayout.astro';
+import { formatRange, getJobs } from '../../experience.ts';
+
+const jobs = await getJobs();
+
+// TODO: keep this list current.
+const skills = [
+  'TypeScript',
+  'JavaScript',
+  'React',
+  'HTML/CSS',
+  'Tailwind',
+  'Node.js',
+  'Elixir',
+  'C#/.NET',
+  'Kafka',
+  'gRPC',
+  'Protobufs',
+  'REST APIs',
+  'Microservices',
+  'SQL',
+  'NoSQL',
+  'AWS',
+  'IaC',
+  'CDK',
+  'Git',
+];
+---
+
+<SectionLayout
+  title="Experience"
+  description="Where Dan Black has worked, from freight shipping at C.H. Robinson to satellite mission planning at True Anomaly."
+  band="--sky-4"
+  slug="experience"
+>
+  <ul class="jobs">
+    {
+      jobs.map((job) => (
+        <li>
+          <h2>
+            {job.data.company}
+            {job.data.product && <span class="product"> · {job.data.product}</span>}
+          </h2>
+          <ul class="roles">
+            {job.data.roles.map((r) => (
+              <li>
+                <span>{r.title}</span>
+                <span class="dates">{formatRange(r.start, r.end)}</span>
+              </li>
+            ))}
+          </ul>
+          <p>{job.data.summary}</p>
+          <a class="button" href={`/experience/${job.id}`}>
+            <span aria-hidden="true">▶</span> {job.data.cta}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <h2>Tools &amp; technologies</h2>
+  <ul class="chips">
+    {skills.map((s) => <li>{s}</li>)}
+  </ul>
+
+  <h2>Education</h2>
+  <p>University of Minnesota, Twin Cities · BS Computer Engineering, 2022</p>
+</SectionLayout>
+
+<style>
+  .jobs {
+    padding: 0;
+    list-style: none;
+  }
+
+  .jobs > li + li {
+    margin-top: 2.5rem;
+  }
+
+  .jobs h2 {
+    margin-top: 0;
+  }
+
+  .product {
+    opacity: 0.7;
+  }
+
+  .roles {
+    margin-top: 0.5rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .roles li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0 1rem;
+    margin: 0;
+  }
+
+  .dates {
+    font-size: 0.875em;
+    opacity: 0.7;
+  }
+
+  .jobs p {
+    margin: 0.75rem 0 1rem;
+  }
+</style>

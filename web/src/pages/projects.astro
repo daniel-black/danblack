@@ -26,11 +26,11 @@ const others = projects.filter((p) => !p.featured);
         </h2>
         <p class="tagline">{p.tagline}</p>
         <p>{p.description}</p>
-        <ul class="tags" aria-label="Built with">
+        <ul class="chips" aria-label="Built with">
           {p.tags.map((t) => <li>{t}</li>)}
         </ul>
         <div class="actions">
-          <a class="cta" href={p.url} target="_blank" rel="noreferrer">
+          <a class="button" href={p.url} target="_blank" rel="noreferrer">
             <span aria-hidden="true">▶</span> {p.cta ?? `Visit ${p.name}`}
           </a>
           {p.repo && (
@@ -98,46 +98,11 @@ const others = projects.filter((p) => !p.featured);
     font-weight: 600;
   }
 
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    padding: 0;
-    list-style: none;
-    font-family: var(--font-pixel);
-    font-size: 0.875rem;
-  }
-
-  .tags li {
-    padding: 0.125rem 0.5rem;
-    border: 2px solid var(--dialog-ink);
-    border-radius: var(--px);
-  }
-
   .actions {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.75rem 1.5rem;
     padding-top: 0.5rem;
-  }
-
-  /* Overrides the underlined .content link style: this one is a button. */
-  :global(.content) a.cta {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    font-family: var(--font-pixel);
-    color: var(--dialog-bg);
-    background: var(--dialog-ink);
-    border-radius: var(--px);
-    text-decoration: none;
-  }
-
-  :global(.content) a.cta::after {
-    content: none;
-  }
-
-  :global(.content) a.cta:hover {
-    background: oklch(from var(--dialog-ink) calc(l + 0.1) c h);
   }
 </style>

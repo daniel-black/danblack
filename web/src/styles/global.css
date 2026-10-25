@@ -425,6 +425,13 @@ body > main {
   --speed: 14s;
 }
 
+/* Full-screen scenes (SpaceScene) replace the sky: no clouds, birds, weather layers, or
+   grass footer while one is showing. */
+:root:has(.scene) .sky-life,
+:root:has(.scene) footer.ground {
+  display: none;
+}
+
 /* Lightning: two quick flashes near the end of each cycle. */
 :root[data-weather='storm'] .flash {
   display: block;
@@ -548,7 +555,7 @@ h2 {
 }
 
 .stage {
-  padding: clamp(2rem, 12vh, 8rem) 1rem 4rem;
+  padding: clamp(2rem, 12vh, 8rem) clamp(0.5rem, 2.5vw, 1rem) 4rem;
 }
 
 /* Body copy on section pages (inside the dialog). */
@@ -637,6 +644,52 @@ h2 {
   font-size: 0.8em;
 }
 
+/* Pixel-font pills for tags and skills. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-pixel);
+  font-size: 0.875rem;
+}
+
+.content .chips {
+  padding-left: 0;
+  list-style: none;
+}
+
+/* Beats the `.content li + li` list spacing. */
+.content .chips li {
+  margin: 0;
+}
+
+.chips li {
+  padding: 0.125rem 0.5rem;
+  border: 2px solid var(--dialog-ink);
+  border-radius: var(--px);
+}
+
+/* A link styled as a dark pixel button (overrides the underlined .content link style). */
+.content a.button {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  font-family: var(--font-pixel);
+  color: var(--dialog-bg);
+  background: var(--dialog-ink);
+  border-radius: var(--px);
+  text-decoration: none;
+}
+
+.content a.button::after {
+  content: none;
+}
+
+.content a.button:hover {
+  background: oklch(from var(--dialog-ink) calc(l + 0.1) c h);
+}
+
 /* Pokémon-style text box: dark outline, cream fill, inset blue frame. */
 .dialog {
   position: relative;
@@ -644,7 +697,7 @@ h2 {
   /* Grows with the screen up to a cap; text grows a little too so lines don't get too long. */
   max-width: clamp(42rem, 62vw, 54rem);
   margin-inline: auto;
-  padding: 2rem;
+  padding: clamp(1.25rem, 5vw, 2rem); /* tighter on phones */
   font-size: clamp(1rem, 0.85rem + 0.25vw, 1.125rem);
   background: var(--dialog-bg);
   border: var(--px) solid var(--dialog-ink);

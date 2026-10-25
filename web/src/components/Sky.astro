@@ -1,12 +1,5 @@
 ---
-// Sky bands from top to bottom, as [color var, relative height].
-const bands: [string, number][] = [
-  ['--sky-1', 30],
-  ['--sky-2', 20],
-  ['--sky-3', 16],
-  ['--sky-4', 14],
-  ['--sky-5', 20],
-];
+// Clouds and birds drift above the bands on every page and persist across navigation.
 
 // Resting x (vw) is used when motion is reduced; duration/delay drive the drift.
 const clouds = [
@@ -24,18 +17,7 @@ const birds = [
 ];
 ---
 
-<div class="sky" aria-hidden="true" transition:persist>
-  {
-    bands.map(([color, weight], i) => {
-      const next = bands[i + 1];
-      return (
-        <>
-          <div class="band" style={`--c: var(${color}); flex-grow: ${weight}`} />
-          {next && <div class="dither" style={`--a: var(${color}); --b: var(${next[0]})`} />}
-        </>
-      );
-    })
-  }
+<div class="sky-life" aria-hidden="true" transition:persist>
   {
     clouds.map((c) => (
       <img

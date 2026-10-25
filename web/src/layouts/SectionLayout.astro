@@ -1,0 +1,41 @@
+---
+import { sections } from '../sections.ts';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Sky color var for the page background, e.g. '--sky-3'. */
+  band: string;
+  /** Section slug; morphs the page background from that band on the home page. */
+  slug?: string;
+}
+
+const { title, description, band, slug } = Astro.props;
+---
+
+<BaseLayout title={`${title} — Dan Black`} description={description}>
+  <div
+    class="page-bg"
+    style={`--c: var(${band})`}
+    transition:name={slug ? `band-${slug}` : undefined}
+  />
+  <header class="site-header">
+    <a class="site-title site-title-sm" href="/" transition:name="site-title">Dan Black</a>
+  </header>
+  <main class="stage">
+    <div class="dialog">
+      <nav class="section-nav" aria-label="Sections">
+        {
+          sections.map((s) => (
+            <a href={`/${s.slug}`} aria-current={s.slug === slug ? 'page' : undefined}>
+              {s.title}
+            </a>
+          ))
+        }
+      </nav>
+      <h1 class="text-4xl mb-4">{title}</h1>
+      <slot />
+    </div>
+  </main>
+</BaseLayout>

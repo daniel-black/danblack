@@ -24,6 +24,7 @@
   --dialog-frame: oklch(62% 0.09 215);
 
   --px: 4px; /* one "art pixel" at the current scale */
+  --gutter: clamp(2rem, 5vw, 3rem); /* wide enough for the hanging menu cursor */
 }
 
 *,
@@ -35,26 +36,174 @@
 body {
   margin: 0;
   min-height: 100dvh;
-  display: grid;
-  grid-template-rows: 1fr auto;
+  display: flex;
+  flex-direction: column;
   color: var(--dialog-ink);
   font-family: system-ui, sans-serif;
   background: var(--sky-5);
 }
 
-/* Fixed backdrop: flat bands joined by dithered rows, so it reads as pixel art. */
-.sky {
+/*
+ * Layering: band fills and page backgrounds sit at z -1, clouds and birds at 0,
+ * labels and dialogs at 1. Bands on the home page are in-flow with no background
+ * of their own, so the drifting sky stays above them but below the text.
+ */
+.sky-life {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.page-bg {
   position: fixed;
   inset: 0;
   z-index: -1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  background: var(--c);
+  view-transition-class: band;
 }
 
-.band {
-  flex-basis: 0;
+body > main {
+  flex: 1 0 auto;
+}
+
+/* Name: a big game-style title on home, a small home link on section pages. */
+.site-title {
+  position: relative;
+  z-index: 1;
+  width: fit-content;
+  margin: 0;
+  font-family: var(--font-pixel);
+  font-size: clamp(3rem, 10vw, 6.5rem);
+  line-height: 1;
+  color: white;
+  text-shadow: 0.06em 0.06em 0 var(--dialog-ink);
+  text-decoration: none;
+  view-transition-class: band;
+}
+
+.site-header {
+  padding: 1.25rem var(--gutter) 0;
+}
+
+.site-title-sm {
+  display: block;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.site-title-sm:hover {
+  translate: 0 calc(var(--px) * -1);
+}
+
+.site-title-sm:focus-visible {
+  outline: var(--px) dashed var(--dialog-ink);
+  outline-offset: var(--px);
+}
+
+/* Home: the sky itself is the navigation. */
+.home {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero {
+  flex: 30 0 auto;
+  display: flex;
+  align-items: center;
+  padding: 3rem var(--gutter);
   background: var(--c);
+}
+
+.contents {
+  flex: 60 0 auto; /* sum of the band weights in index.astro */
+  display: flex;
+  flex-direction: column;
+}
+
+.band-link {
+  position: relative;
+  flex: 1 0 calc(var(--px) * 16);
+  display: flex;
+  align-items: center;
+  padding-inline: var(--gutter);
+  color: var(--dialog-ink);
+  text-decoration: none;
+}
+
+.band-fill {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--c);
+  view-transition-class: band;
+}
+
+.band-link:hover .band-fill,
+.band-link:focus-visible .band-fill {
+  filter: brightness(1.06);
+}
+
+.band-link:focus-visible {
+  outline: var(--px) dashed var(--dialog-ink);
+  outline-offset: calc(var(--px) * -3);
+}
+
+.band-label {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-pixel);
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+}
+
+/* Pokémon-menu cursor: hangs in the gutter so labels align with the title;
+   hidden until hover/focus, then blinks. */
+.cursor {
+  position: absolute;
+  right: 100%;
+  margin-right: 0.35em;
+  font-size: 0.6em;
+  top: 50%;
+  translate: 0 -50%;
+  visibility: hidden;
+}
+
+.band-link:hover .cursor,
+.band-link:focus-visible .cursor {
+  visibility: visible;
+  animation: blink 0.8s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    visibility: hidden;
+  }
+}
+
+.section-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin-bottom: 1.5rem;
+  font-family: var(--font-pixel);
+}
+
+.section-nav a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.section-nav a:hover,
+.section-nav a[aria-current='page'] {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+/* The zoom: a band grows into the next page's background (and back); the title
+   shrinks into the corner alongside it. */
+::view-transition-group(*.band) {
+  animation-duration: 0.5s;
+  animation-timing-function: cubic-bezier(0.7, 0, 0.3, 1);
 }
 
 /* Three 2px-art rows: 25% → 50% → 75% of the next color. */
@@ -130,11 +279,13 @@ h2 {
 }
 
 .stage {
-  padding: clamp(6rem, 25vh, 14rem) 1rem 4rem;
+  padding: clamp(2rem, 12vh, 8rem) 1rem 4rem;
 }
 
 /* Pokémon-style text box: dark outline, cream fill, inset blue frame. */
 .dialog {
+  position: relative;
+  z-index: 1;
   max-width: 42rem;
   margin-inline: auto;
   padding: 2rem;
@@ -178,5 +329,11 @@ h2 {
 
   .bird {
     display: none;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }

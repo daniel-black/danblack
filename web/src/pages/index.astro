@@ -1,9 +1,32 @@
 ---
-import Counter from '../islands/Counter.tsx';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { sections } from '../sections.ts';
+
+const bands = ['--sky-1', ...sections.map((s) => s.band)];
+// Relative band heights: tallest up high, thinning toward the horizon (hero is 30).
+const weights = [20, 16, 13, 11];
 ---
 
 <BaseLayout title="Dan Black" description="Personal site of Dan Black.">
-  <h1 class="text-5xl mb-4">Dan Black</h1>
-  <Counter client:visible />
+  <main class="home">
+    <div class="hero" style="--c: var(--sky-1)">
+      <h1 class="site-title" transition:name="site-title">Dan Black</h1>
+    </div>
+    <nav class="contents" aria-label="Sections">
+      {
+        sections.map((s, i) => (
+          <>
+            <div class="dither" style={`--a: var(${bands[i]}); --b: var(${s.band})`} />
+            <a class="band-link" href={`/${s.slug}`} style={`flex-grow: ${weights[i]}`}>
+              <span class="band-fill" style={`--c: var(${s.band})`} transition:name={`band-${s.slug}`} />
+              <span class="band-label">
+                <span class="cursor" aria-hidden="true">▶</span>
+                {s.title}
+              </span>
+            </a>
+          </>
+        ))
+      }
+    </nav>
+  </main>
 </BaseLayout>

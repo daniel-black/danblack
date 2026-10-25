@@ -43,11 +43,7 @@ const ogImage = new URL(image, Astro.site);
   </head>
   <body>
     <Sky />
-    <main class="stage">
-      <div class="dialog">
-        <slot />
-      </div>
-    </main>
+    <slot />
     <footer class="ground" transition:persist></footer>
   </body>
 </html>

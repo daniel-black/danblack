@@ -12,14 +12,15 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description: string;
+  /** Social preview image (path under public/). Left out of the head when not set. */
   image?: string;
   /** Marks the page as an article (og:type and published/modified times). */
   article?: { publishedTime: Date; modifiedTime?: Date | undefined };
 }
 
-const { title, description, image = '/og.png', article } = Astro.props;
+const { title, description, image, article } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
-const ogImage = new URL(image, Astro.site);
+const ogImage = image && new URL(image, Astro.site);
 ---
 
 <!doctype html>
@@ -32,7 +33,6 @@ const ogImage = new URL(image, Astro.site);
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <meta property="og:type" content={article ? 'article' : 'website'} />
@@ -45,11 +45,11 @@ const ogImage = new URL(image, Astro.site);
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={ogImage} />
-    <meta name="twitter:card" content="summary_large_image" />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImage} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
 
     <meta name="generator" content={Astro.generator} />
     <ClientRouter />

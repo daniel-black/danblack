@@ -285,6 +285,27 @@ LBbL.KGgdK.LbBL
 LLLL.KKKKK.LLLL`;
 
 const sprites = {
+  // Site icon: a little cloud on a sky-blue tile.
+  favicon: [
+    { S: '#5aaee8', W: '#ffffff', w: '#dcecf8', d: '#b4d4ec' },
+    `
+SSSSSSSSSSSSSSSS
+SSSSSSSSSSSSSSSS
+SSSSSSSSSSSSSSSS
+SSSSSSSWWWSSSSSS
+SSSSSWWWWWWSSSSS
+SSSSWWWWWWWWWSSS
+SSWWWWWWWWWWWWSS
+SWWWWWWWWWWWWWWS
+SWWWWWWWWWWWWWWS
+SwwwwWWWWWWwwwwS
+SwwwwwwwwwwwwwwS
+SSddddddddddddSS
+SSSSSSSSSSSSSSSS
+SSSSSSSSSSSSSSSS
+SSSSSSSSSSSSSSSS
+SSSSSSSSSSSSSSSS`,
+  ],
   semi: [semiPalette, semiArt],
   hills: [hillsPalette, hillsArt],
   prairie: [prairiePalette, prairieArt],
@@ -521,8 +542,10 @@ for (const [name, [palette, art]] of Object.entries(sprites)) {
       x = end;
     }
   });
+  // The favicon is served from the site root.
+  const path = name === 'favicon' ? fileURLToPath(new URL('../public/favicon.svg', import.meta.url)) : `${out}/${name}.svg`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${rows.length}" width="${w}" height="${rows.length}" shape-rendering="crispEdges">${rects.join('')}</svg>\n`;
-  writeFileSync(`${out}/${name}.svg`, svg);
+  writeFileSync(path, svg);
   console.log(name, `${w}x${rows.length}`, rects.length, 'rects');
 }
 

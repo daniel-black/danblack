@@ -31,7 +31,7 @@ const { title, description, band, slug, article } = Astro.props;
       <nav class="section-nav" aria-label="Sections">
         {
           sections.map((s) => (
-            <a href={`/${s.slug}`} aria-current={s.slug === slug ? 'page' : undefined}>
+            <a href={`/${s.slug}/`} aria-current={s.slug === slug ? 'page' : undefined}>
               {s.title}
             </a>
           ))

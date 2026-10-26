@@ -17,7 +17,7 @@ const weights = [20, 16, 13, 11];
         sections.map((s, i) => (
           <>
             <div class="dither" style={`--a: var(${bands[i]}); --b: var(${s.band})`} />
-            <a class="band-link" href={`/${s.slug}`} style={`flex-grow: ${weights[i]}`}>
+            <a class="band-link" href={`/${s.slug}/`} style={`flex-grow: ${weights[i]}`}>
               <span class="band-fill" style={`--c: var(${s.band})`} transition:name={`band-${s.slug}`} />
               <span class="band-label">
                 <span class="cursor" aria-hidden="true">▶</span>

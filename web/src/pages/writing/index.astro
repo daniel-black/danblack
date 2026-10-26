@@ -10,7 +10,7 @@ const posts = await getPosts();
     {
       posts.map((post) => (
         <li>
-          <a href={`/writing/${post.id}`}>{post.data.title}</a>
+          <a href={`/writing/${post.id}/`}>{post.data.title}</a>
           <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
           <p>{post.data.description}</p>
         </li>

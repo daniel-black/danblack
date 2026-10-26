@@ -35,6 +35,7 @@ Then open http://localhost:4321.
 | --- | --- |
 | `pnpm dev` | Runs the site locally |
 | `pnpm build` | Builds the static site into `web/dist` |
+| `pnpm typecheck` | Type-checks everything (Astro, TypeScript, content schemas) |
 | `pnpm --filter web sprites` | Regenerates all the pixel art in `web/public/sprites` |
 
 ## How it's laid out

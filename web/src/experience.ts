@@ -1,4 +1,4 @@
-import { getCollection } from 'astro:content';
+import { type CollectionEntry, getCollection } from 'astro:content';
 
 /** Jobs, most recent first (by the start of each job's latest role). */
 export async function getJobs() {
@@ -6,7 +6,7 @@ export async function getJobs() {
   return jobs.sort((a, b) => latestStart(b) - latestStart(a));
 }
 
-const latestStart = (job: Awaited<ReturnType<typeof getJobs>>[number]) =>
+const latestStart = (job: CollectionEntry<'experience'>) =>
   Math.max(...job.data.roles.map((r) => r.start.valueOf()));
 
 const month = (date: Date) =>

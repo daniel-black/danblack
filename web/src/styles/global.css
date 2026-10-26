@@ -270,6 +270,14 @@ body > main {
   view-transition-class: band;
 }
 
+/* Subtitle under the home title: same outlined lettering, smaller. */
+.site-tagline {
+  --drop: calc(var(--o) * 2);
+  margin-top: 0.5rem;
+  font-size: clamp(1.25rem, 3.5vw, 2.25rem);
+  view-transition-class: none;
+}
+
 .site-header {
   padding: 1.25rem var(--gutter) 0;
 }

@@ -1,0 +1,37 @@
+# Pushes to main: build the site and deploy it to S3 + CloudFront.
+# AWS access comes from the OIDC deploy role (GitHubOidcStack), which only trusts
+# workflows on main of this repo, so its ARN isn't a secret.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write # to request the OIDC token for AWS
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm build
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::621422876704:role/danblack-github-deploy
+          aws-region: us-east-1
+      # --exclusively: deploy only SiteStack, never the stacks it depends on (DnsStack).
+      - run: pnpm --filter infra exec cdk deploy SiteStack --exclusively --require-approval never

@@ -50,6 +50,12 @@ web/                    the Astro site
   scripts/              sprite generators (sprites.mjs, earth.mjs)
 ```
 
+## Hosting
+
+The site is served from S3 and CloudFront on AWS and deploys automatically on every push to
+`main`. How it's set up, what was done when, and how to redo it are in
+[infra/README.md](infra/README.md).
+
 ## Adding stuff
 
 - **A blog post:** drop a `.md` file in `web/src/content/writing/` with `title`, `description`, and `pubDate` in the frontmatter. Use `.mdx` if you want components in it, and `draft: true` to keep it out of production.

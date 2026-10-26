@@ -129,6 +129,14 @@
   --gutter: clamp(2rem, 5vw, 3rem); /* wide enough for the hanging menu cursor */
 }
 
+/* Text selection: pixel yellow with dark text, readable on light and dark boxes alike.
+   Shadows are dropped so the title's outline doesn't smear inside the highlight. */
+::selection {
+  color: oklch(25% 0.03 260);
+  background: oklch(88% 0.16 95);
+  text-shadow: none;
+}
+
 /* Time of day */
 :root[data-time='night'] {
   --t-sky-1: oklch(20% 0.06 275);

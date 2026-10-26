@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "synth": "cdk synth",
-    "deploy": "cdk deploy SiteStack",
+    "deploy": "cdk deploy SiteStack --exclusively",
+    "deploy:oidc": "cdk deploy GitHubOidcStack",
+    "deploy:dns": "cdk deploy DnsStack",
     "diff": "cdk diff",
     "typecheck": "tsc",
     "cdk": "cdk"

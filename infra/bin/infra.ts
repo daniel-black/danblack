@@ -10,7 +10,11 @@ const env = { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'us-east-1' };
 const domainName = 'danblack.co';
 
 // One-time setup: lets GitHub Actions on main deploy without long-lived keys.
-new GitHubOidcStack(app, 'GitHubOidcStack', { env, repo: 'daniel-black/danblack', branch: 'main' });
+new GitHubOidcStack(app, 'GitHubOidcStack', {
+  env,
+  repo: { owner: 'daniel-black', ownerId: 53156789, name: 'danblack', id: 1433721411 },
+  branch: 'main',
+});
 
 // The domain's hosted zone. Point the registrar at its nameservers after the first deploy.
 const dns = new DnsStack(app, 'DnsStack', { env, domainName });

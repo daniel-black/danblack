@@ -3,8 +3,13 @@ import { OidcProviderNative, OpenIdConnectPrincipal, PolicyStatement, Role } fro
 import type { Construct } from 'constructs';
 
 interface GitHubOidcStackProps extends StackProps {
-  /** "owner/repo" allowed to assume the deploy role. */
-  repo: string;
+  /**
+   * The repo allowed to assume the deploy role, with GitHub's numeric IDs. The repo uses
+   * GitHub's immutable subject claims, so tokens identify it as `owner@ownerId/name@repoId`
+   * (see `gh api repos/OWNER/REPO/actions/oidc/customization/sub`). The IDs mean a repo
+   * recreated under the same name after a rename or deletion can't inherit this access.
+   */
+  repo: { owner: string; ownerId: number; name: string; id: number };
   /** Only workflows running on this branch can deploy. */
   branch: string;
 }
@@ -26,13 +31,18 @@ export class GitHubOidcStack extends Stack {
       removalPolicy: RemovalPolicy.RETAIN,
     });
 
+    const { repo, branch } = props;
+    const subject = `repo:${repo.owner}@${repo.ownerId}/${repo.name}@${repo.id}:ref:refs/heads/${branch}`;
+
     const role = new Role(this, 'DeployRole', {
       roleName: 'danblack-github-deploy',
-      description: `Deploys danblack.co from ${props.repo}@${props.branch}`,
+      description: `Deploys danblack.co from ${repo.owner}/${repo.name}@${branch}`,
       maxSessionDuration: Duration.hours(1),
       assumedBy: new OpenIdConnectPrincipal(provider, {
-        StringEquals: { 'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com' },
-        StringLike: { 'token.actions.githubusercontent.com:sub': `repo:${props.repo}:ref:refs/heads/${props.branch}` },
+        StringEquals: {
+          'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
+          'token.actions.githubusercontent.com:sub': subject,
+        },
       }),
     });
 

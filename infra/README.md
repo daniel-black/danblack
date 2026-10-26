@@ -51,6 +51,7 @@ unless the account is rebuilt from scratch.
 | 2026-10-25 | Deployed `GitHubOidcStack`: `npx cdk deploy GitHubOidcStack --profile danblackco` | Role `arn:aws:iam::621422876704:role/danblack-github-deploy`, hardcoded in `deploy.yml`; trusts only `main` of `daniel-black/danblack` |
 | 2026-10-25 | Deployed `DnsStack`: `npx cdk deploy DnsStack --profile danblackco` | Nameservers: `ns-1074.awsdns-06.org`, `ns-61.awsdns-07.com`, `ns-2044.awsdns-63.co.uk`, `ns-954.awsdns-55.net` |
 | 2026-10-25 | Cut over the domain: set `"customDomain": true` in `cdk.json`, deployed `SiteStack`, and switched the nameservers at the registrar to the four above | The domain is registered at **Squarespace** (Domains → danblack.co → DNS → Nameservers). DNS was previously hosted by Vercel |
+| 2026-10-26 | Redeployed `GitHubOidcStack` with a corrected trust policy | The first deploy from GitHub failed with "Not authorized to perform sts:AssumeRoleWithWebIdentity": this repo uses GitHub's **immutable subject claims**, so its tokens' `sub` is `repo:daniel-black@53156789/danblack@1433721411:ref:refs/heads/main`, not `repo:daniel-black/danblack:…` |
 
 ## Rebuilding from scratch
 
@@ -58,7 +59,7 @@ The same steps, generalized:
 
 1. Create an account and an Identity Center profile for it.
 2. `npx cdk bootstrap aws://ACCOUNT/us-east-1 --profile PROFILE`
-3. Update the account ID in `.github/workflows/deploy.yml`, and the repo/branch in `bin/infra.ts` if they changed.
+3. Update the account ID in `.github/workflows/deploy.yml`, and the repo/branch in `bin/infra.ts` if they changed. The repo's numeric owner and repo IDs go there too: run `gh api repos/OWNER/REPO/actions/oidc/customization/sub` and copy them from `sub_claim_prefix`.
 4. Deploy `GitHubOidcStack` and `DnsStack` once each.
 5. With `"customDomain": false` in `cdk.json`, build and deploy `SiteStack`; check it on its `cloudfront.net` domain.
 6. Set `"customDomain": true`, deploy `SiteStack` again, and point the registrar's nameservers at the `DnsStack` output. The certificate validates through the hosted zone, so it issues once the nameservers switch.

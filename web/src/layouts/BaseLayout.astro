@@ -1,6 +1,7 @@
 ---
 import { Font } from 'astro:assets';
 import { ClientRouter } from 'astro:transitions';
+import Analytics from '../components/Analytics.astro';
 import Boats from '../components/Boats.astro';
 import Descent from '../components/Descent.astro';
 import PageTransitions from '../components/PageTransitions.astro';
@@ -76,6 +77,7 @@ const ogImage = new URL(image.src, Astro.site);
     <ClientRouter />
     <SkyState />
     <PageTransitions />
+    <Analytics />
   </head>
   <body>
     <Sky />

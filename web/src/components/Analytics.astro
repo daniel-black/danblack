@@ -1,0 +1,28 @@
+---
+// Google Analytics 4, production builds only (so local dev visits aren't counted).
+// The site swaps pages without full reloads, so page views are sent explicitly on every
+// page load, including the first; GA's own automatic page_view is turned off to avoid doubles.
+// The measurement ID is public (it ships in every page), so it lives here rather than in env.
+const GA_ID = 'G-M1LRX17J56';
+---
+
+{
+  import.meta.env.PROD && (
+    <>
+      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
+      <script is:inline define:vars={{ GA_ID }}>
+        if (!window.gtag) {
+          window.dataLayer = window.dataLayer || [];
+          window.gtag = function () {
+            window.dataLayer.push(arguments);
+          };
+          window.gtag('js', new Date());
+          window.gtag('config', GA_ID, { send_page_view: false });
+          document.addEventListener('astro:page-load', () => {
+            window.gtag('event', 'page_view', { page_location: location.href, page_title: document.title });
+          });
+        }
+      </script>
+    </>
+  )
+}

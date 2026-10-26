@@ -1,7 +1,6 @@
 // @ts-check
 import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
-import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, fontProviders } from 'astro/config';
 
 // https://astro.build/config
@@ -16,7 +15,6 @@ export default defineConfig({
   redirects: {
     '/blog/variable-duty-cycle-square-wave': '/writing/variable-duty-cycle-square-wave',
   },
-  vite: { plugins: [tailwindcss()] },
   fonts: [
     {
       provider: fontProviders.local(),

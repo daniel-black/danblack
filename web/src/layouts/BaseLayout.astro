@@ -7,20 +7,30 @@ import PageTransitions from '../components/PageTransitions.astro';
 import Sky from '../components/Sky.astro';
 import SkyControls from '../components/SkyControls.astro';
 import SkyState from '../components/SkyState.astro';
+import { PROFILES, SITE_NAME } from '../seo.ts';
 import '../styles/global.css';
 
 interface Props {
   title: string;
   description: string;
-  /** Social preview image (path under public/). Left out of the head when not set. */
-  image?: string;
+  /** Social preview image: a 1200×630 path under public/. Defaults to the site-wide image. */
+  image?: { src: string; alt: string };
   /** Marks the page as an article (og:type and published/modified times). */
   article?: { publishedTime: Date; modifiedTime?: Date | undefined };
+  /** schema.org structured data for this page. */
+  jsonLd?: Record<string, unknown>;
+  /** Keep the page out of search results (e.g. the 404 page). */
+  noindex?: boolean;
 }
 
-const { title, description, image, article } = Astro.props;
+const DEFAULT_IMAGE = {
+  src: '/og.png',
+  alt: 'Dan Black in pixel letters over a sky with clouds, above a sailboat on the sea and a strip of grass.',
+};
+
+const { title, description, image = DEFAULT_IMAGE, article, jsonLd, noindex = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
-const ogImage = image && new URL(image, Astro.site);
+const ogImage = new URL(image.src, Astro.site);
 ---
 
 <!doctype html>
@@ -31,10 +41,16 @@ const ogImage = image && new URL(image, Astro.site);
     <Font cssVariable="--font-geist-pixel" preload />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    <meta name="author" content={SITE_NAME} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    <meta name="theme-color" content="#4aa8e8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="alternate" type="application/rss+xml" title="Dan Black — Writing" href="/writing/rss.xml" />
+    {PROFILES.map((href) => <link rel="me" href={href} />)}
 
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:type" content={article ? 'article' : 'website'} />
     {article && <meta property="article:published_time" content={article.publishedTime.toISOString()} />}
     {
@@ -45,11 +61,16 @@ const ogImage = image && new URL(image, Astro.site);
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    {ogImage && <meta property="og:image" content={ogImage} />}
-    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={image.alt} />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    {ogImage && <meta name="twitter:image" content={ogImage} />}
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={image.alt} />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
 
     <meta name="generator" content={Astro.generator} />
     <ClientRouter />

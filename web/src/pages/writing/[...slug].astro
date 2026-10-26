@@ -1,6 +1,7 @@
 ---
 import { render } from 'astro:content';
 import SectionLayout from '../../layouts/SectionLayout.astro';
+import { PERSON } from '../../seo.ts';
 import { formatDate, getPosts } from '../../writing.ts';
 
 export async function getStaticPaths() {
@@ -12,6 +13,20 @@ const { post } = Astro.props;
 const { Content } = await render(post);
 const { title, description, pubDate, updatedDate, originalUrl } = post.data;
 const originalHost = originalUrl && new URL(originalUrl).hostname.replace(/^www\./, '');
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  datePublished: pubDate.toISOString(),
+  ...(updatedDate && { dateModified: updatedDate.toISOString() }),
+  url: new URL(Astro.url.pathname, Astro.site).href,
+  mainEntityOfPage: new URL(Astro.url.pathname, Astro.site).href,
+  image: new URL('/og.png', Astro.site).href,
+  author: PERSON,
+  ...(originalUrl && { isBasedOn: originalUrl }),
+};
 ---
 
 <SectionLayout
@@ -20,6 +35,7 @@ const originalHost = originalUrl && new URL(originalUrl).hostname.replace(/^www\
   band="--sky-5"
   slug="writing"
   article={{ publishedTime: pubDate, modifiedTime: updatedDate }}
+  jsonLd={jsonLd}
 >
   <p class="post-meta">
     <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>

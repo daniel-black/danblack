@@ -10,12 +10,20 @@ interface Props {
   /** Section slug; morphs the page background from that band on the home page. */
   slug?: string;
   article?: { publishedTime: Date; modifiedTime?: Date | undefined };
+  jsonLd?: Record<string, unknown>;
+  noindex?: boolean;
 }
 
-const { title, description, band, slug, article } = Astro.props;
+const { title, description, band, slug, article, jsonLd, noindex } = Astro.props;
 ---
 
-<BaseLayout title={`${title} — Dan Black`} description={description} article={article}>
+<BaseLayout
+  title={`${title} — Dan Black`}
+  description={description}
+  article={article}
+  jsonLd={jsonLd}
+  noindex={noindex}
+>
   <div
     class="page-bg"
     style={`--c: var(${band})`}

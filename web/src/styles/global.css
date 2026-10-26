@@ -698,6 +698,11 @@ h2 {
   height: auto;
 }
 
+/* Block so the spacing between content children applies to it. */
+.content picture {
+  display: block;
+}
+
 .content :not(pre) > code {
   padding: 0.1em 0.3em;
   font-size: 0.9em;

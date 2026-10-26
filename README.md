@@ -1,5 +1,7 @@
 # danblack.co
 
+![Dan Black in pixel letters over a sky with clouds, above a sailboat on the sea and a strip of grass](web/public/og.png)
+
 My personal site. It's a little pixel-art world: a sky full of drifting clouds and birds up top, grass along the bottom, and the actual content in a text box in the middle.
 
 Under the hood it's a fully static site. Every page ships as plain HTML, so search engines, AI crawlers, and link previews see everything, and JavaScript only shows up where something is actually interactive.

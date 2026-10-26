@@ -1,13 +1,27 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { sections } from '../sections.ts';
+import { PERSON, SITE_NAME } from '../seo.ts';
 
 const bands = ['--sky-1', ...sections.map((s) => s.band)];
 // Relative band heights: tallest up high, thinning toward the horizon (hero is 30).
 const weights = [20, 16, 13, 11];
+
+// The site and the person it's about, for search engines.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'WebSite', '@id': 'https://danblack.co/#website', name: SITE_NAME, url: 'https://danblack.co/', author: { '@id': PERSON['@id'] } },
+    PERSON,
+  ],
+};
 ---
 
-<BaseLayout title="Dan Black" description="Personal site of Dan Black.">
+<BaseLayout
+  title="Dan Black — Software Engineer"
+  description="Dan Black is a software engineer in Denver with a passion for making beautiful, useful things."
+  jsonLd={jsonLd}
+>
   <main class="home">
     <div class="hero" style="--c: var(--sky-1)">
       <h1 class="site-title" transition:name="site-title">Dan Black</h1>

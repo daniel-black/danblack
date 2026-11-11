@@ -41,6 +41,11 @@ const others = projects.filter((p) => !p.featured);
           <a class="button" href={p.url} target="_blank" rel="noreferrer">
             <span aria-hidden="true">▶</span> {p.cta ?? `Visit ${p.name}`}
           </a>
+          {p.demo && (
+            <a href={p.demo.url} target="_blank" rel="noreferrer">
+              {p.demo.label}
+            </a>
+          )}
           {p.repo && (
             <a href={p.repo} target="_blank" rel="noreferrer">
               Source on GitHub
